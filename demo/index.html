@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stylizer - Universal Font Picker Web Component</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles/demo.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <h1 class="logo">🎨 Stylizer</h1>
+        <div class="header-actions">
+          <button id="themeToggle" class="btn-icon" aria-label="Toggle theme">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <a href="https://github.com/yourusername/jsg-stylizer" class="btn-icon" aria-label="GitHub">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h2 class="hero-title">Universal Font Picker Web Component</h2>
+        <p class="hero-subtitle">Framework-agnostic font experimentation tool for Google Fonts. Works in vanilla JS, React, Vue, Svelte, Astro, and anywhere else.</p>
+        <div class="hero-actions">
+          <a href="#installation" class="btn btn-primary">Get Started</a>
+          <a href="https://www.npmjs.com/package/@jsg/stylizer" class="btn btn-secondary">npm →</a>
+        </div>
+        <!-- Live Demo Component -->
+        <div class="demo-preview">
+          <h3 class="demo-title" id="demo-primary">Primary Font Demo</h3>
+          <h4 class="demo-subtitle" id="demo-secondary">Secondary Font Demo</h4>
+          <p class="demo-text">The quick brown fox jumps over the lazy dog. 0123456789</p>
+          <div class="demo-stylizer">
+            <jsg-stylizer 
+              is-development="true"
+              default-primary-font="Inter"
+              default-secondary-font="JetBrains Mono"
+              preview-text="Build. Lead. Learn. JSG Tech Check.">
+            </jsg-stylizer>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Features</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🌐</div>
+          <h3>Framework Agnostic</h3>
+          <p>Works everywhere - React, Vue, Svelte, Astro, or vanilla JS</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>Dual Font Support</h3>
+          <p>Separate controls for primary and secondary fonts</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎨</div>
+          <h3>Curated Mode</h3>
+          <p>38 handpicked fonts, zero API key needed</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3>Browse All Mode</h3>
+          <p>Access 1500+ Google Fonts with API key</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⭐</div>
+          <h3>Favorites System</h3>
+          <p>Save your favorite fonts to localStorage</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎭</div>
+          <h3>Font Variants</h3>
+          <p>Select font weights and italic styles</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Framework Examples -->
+  <section class="section section-dark" id="examples">
+    <div class="container">
+      <h2 class="section-title">Works in Every Framework</h2>
+      <div class="tabs">
+        <button class="tab active" data-tab="vanilla">Vanilla JS</button>
+        <button class="tab" data-tab="react">React</button>
+        <button class="tab" data-tab="svelte">Svelte</button>
+        <button class="tab" data-tab="vue">Vue</button>
+        <button class="tab" data-tab="astro">Astro</button>
+      </div>
+      
+      <div class="tab-content">
+        <!-- Vanilla JS -->
+        <div class="tab-pane active" id="vanilla">
+          <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;body&gt;
+  &lt;h1&gt;Hello Stylizer!&lt;/h1&gt;
+  
+  &lt;jsg-stylizer 
+    is-development="true"
+    default-primary-font="Roboto"&gt;
+  &lt;/jsg-stylizer&gt;
+  
+  &lt;script type="module"&gt;
+    import '@jsg/stylizer';
+    
+    document.querySelector('jsg-stylizer')
+      .addEventListener('font-changed', (e) =&gt; {
+        console.log('Font changed:', e.detail);
+      });
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+        </div>
+        
+        <!-- React -->
+        <div class="tab-pane" id="react">
+          <pre><code>import '@jsg/stylizer';
+
+function App() {
+  const handleFontChange = (e) =&gt; {
+    console.log('Font changed:', e.detail);
+  };
+  
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;My React App&lt;/h1&gt;
+      &lt;jsg-stylizer
+        is-development={import.meta.env.DEV}
+        default-primary-font="Roboto"
+        onFont-changed={handleFontChange}
+      /&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+        </div>
+        
+        <!-- Svelte -->
+        <div class="tab-pane" id="svelte">
+          <pre><code>&lt;script lang="ts"&gt;
+  import '@jsg/stylizer';
+  
+  function handleFontChange(e) {
+    console.log('Font changed:', e.detail);
+  }
+&lt;/script&gt;
+
+&lt;h1&gt;My Svelte App&lt;/h1&gt;
+
+&lt;jsg-stylizer
+  is-development="true"
+  default-primary-font="Roboto"
+  on:font-changed={handleFontChange}
+/&gt;</code></pre>
+        </div>
+        
+        <!-- Vue -->
+        <div class="tab-pane" id="vue">
+          <pre><code>&lt;script setup lang="ts"&gt;
+import '@jsg/stylizer';
+
+const handleFontChange = (e) =&gt; {
+  console.log('Font changed:', e.detail);
+};
+&lt;/script&gt;
+
+&lt;template&gt;
+  &lt;div&gt;
+    &lt;h1&gt;My Vue App&lt;/h1&gt;
+    &lt;jsg-stylizer
+      is-development="true"
+      default-primary-font="Roboto"
+      @font-changed="handleFontChange"
+    /&gt;
+  &lt;/div&gt;
+&lt;/template&gt;</code></pre>
+        </div>
+        
+        <!-- Astro -->
+        <div class="tab-pane" id="astro">
+          <pre><code>---
+import '@jsg/stylizer';
+---
+
+&lt;h1&gt;My Astro Site&lt;/h1&gt;
+
+&lt;jsg-stylizer
+  is-development={import.meta.env.DEV}
+  default-primary-font="Roboto"
+/&gt;</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Installation -->
+  <section class="section" id="installation">
+    <div class="container">
+      <h2 class="section-title">Installation</h2>
+      <div class="install-options">
+        <div class="install-card">
+          <h3>npm</h3>
+          <pre><code>npm install @jsg/stylizer</code></pre>
+        </div>
+        <div class="install-card">
+          <h3>CDN</h3>
+          <pre><code>&lt;script type="module" src="https://unpkg.com/@jsg/stylizer"&gt;&lt;/script&gt;</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>Made with ❤️ by <a href="https://jsg-tech-check.com">JSG Tech Check</a></p>
+      <p><a href="https://github.com/yourusername/jsg-stylizer">GitHub</a> • <a href="https://www.npmjs.com/package/@jsg/stylizer">npm</a></p>
+    </div>
+  </footer>
+
+  <script type="module" src="../dist/index.esm.js"></script>
+  <script src="./scripts/demo.js"></script>
+</body>
+</html>
+
+
