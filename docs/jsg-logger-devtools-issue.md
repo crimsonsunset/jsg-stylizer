@@ -2,15 +2,20 @@
 
 **Date**: November 5, 2025  
 **Component**: jsg-stylizer package  
-**Logger Version**: @crimsonsunset/jsg-logger@1.5.2 → **RESOLVED** (patch version with conditional DevTools)  
+**Logger Version**: @crimsonsunset/jsg-logger@1.5.5 (updated from 1.5.2)  
 **Status**: ✅ **RESOLVED** - Fixed via conditional DevTools bundling
 
 ---
 
 ## Resolution Summary
 
-**Fixed in**: Patch version of `@crimsonsunset/jsg-logger`  
+**Fixed in**: Patch version of `@crimsonsunset/jsg-logger` (v1.5.2+)  
 **Solution**: Conditional DevTools bundling - DevTools is now optional and disabled by default
+
+**Updated to**: v1.5.5 (January 2025)  
+**New Features**:
+- `window.JSG_Logger` automatically exposed when calling `getInstance()` (previously only with `getInstanceSync()`)
+- DevTools panel duplicate prevention bug fix
 
 ### What Changed
 
@@ -567,6 +572,8 @@ Removing the logger throws away good integration work and will need to be redone
 - [x] ✅ DevTools disabled by default (tree-shaken)
 - [x] ✅ No breaking changes - backward compatible
 - [x] ✅ Documented resolution in this file
+- [x] ✅ Updated to v1.5.5 - Automatic `window.JSG_Logger` exposure
+- [x] ✅ Removed manual `window.JSG_Logger` assignment (now handled by logger)
 - [ ] Update stylizer-implementation-summary.md with resolution (if needed)
 
 ---
@@ -581,5 +588,38 @@ Removing the logger throws away good integration work and will need to be redone
 
 ---
 
-**Status**: ✅ **RESOLVED** - Fixed via conditional DevTools bundling in logger patch version. No action needed for stylizer package - DevTools disabled by default, zero bundle impact.
+**Status**: ✅ **RESOLVED** - Fixed via conditional DevTools bundling in logger patch version. Updated to v1.5.5 for automatic `window.JSG_Logger` exposure. Manual `window.JSG_Logger` assignment removed from stylizer codebase.
+
+---
+
+## v1.5.5 Update (January 2025)
+
+### Changes Applied
+
+1. **Updated package.json**: `@crimsonsunset/jsg-logger` from `^1.5.3` → `^1.5.5`
+2. **Removed manual `window.JSG_Logger` assignment**: Now handled automatically by logger when calling `getInstance()`
+3. **Updated documentation**: Reflects v1.5.5 changes and automatic exposure
+
+### Consumer Changes (v1.5.5)
+
+**Before (manual assignment):**
+```typescript
+const logger = JSGLogger.getInstance({ devtools: { enabled: true } });
+if (typeof window !== 'undefined' && logger.controls) {
+  window.JSG_Logger = logger.controls; // Manual assignment
+}
+```
+
+**After (automatic):**
+```typescript
+const logger = JSGLogger.getInstance({ devtools: { enabled: true } });
+// window.JSG_Logger is now automatically available!
+```
+
+### Benefits
+
+- ✅ Cleaner code - no manual `window.JSG_Logger` assignment needed
+- ✅ Consistent behavior - same automatic exposure as `getInstanceSync()`
+- ✅ Bug fix - DevTools panel duplicate prevention
+- ✅ Backward compatible - manual assignment still works (but redundant)
 

@@ -18,11 +18,17 @@ declare module '@crimsonsunset/jsg-logger' {
     [key: string]: any;
   }
 
+  export interface LoggerControls {
+    enableDevPanel?: () => Promise<any>;
+    [key: string]: any;
+  }
+
   export interface JSGLogger {
     getInstance(config?: JSGLoggerConfig): {
       components?: {
         webComponents?: LoggerInstance;
       };
+      controls?: LoggerControls;
     };
   }
 

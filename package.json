@@ -25,7 +25,7 @@
     "demo": "vite demo --open"
   },
   "dependencies": {
-    "@crimsonsunset/jsg-logger": "^1.5.3",
+    "@crimsonsunset/jsg-logger": "^1.5.5",
     "fontpicker": "github:wipeautcrafter/jsfontpicker"
   },
   "devDependencies": {

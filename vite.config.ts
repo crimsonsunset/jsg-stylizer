@@ -24,6 +24,16 @@ export default defineConfig({
   optimizeDeps: {
     // Exclude logger from dep optimization to avoid devtools import issues
     exclude: ['@crimsonsunset/jsg-logger']
+  },
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src')
+    }
+  },
+  server: {
+    fs: {
+      allow: ['..']
+    }
   }
 });
 
