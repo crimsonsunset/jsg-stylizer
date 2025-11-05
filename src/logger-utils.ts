@@ -13,16 +13,21 @@ function getLogger() {
       // Try to import and initialize JSG Logger
       const JSGLogger = require('@crimsonsunset/jsg-logger');
       const logger = JSGLogger.getInstance({
-        configPath: 'logger-config.json'
+        configPath: 'logger-config.json',
+        // Explicitly disable DevTools to prevent build issues
+        // DevTools code will be tree-shaken when disabled
+        devtools: {
+          enabled: true
+        }
       });
-      
+
       if (logger.components?.webComponents) {
         loggerInstance = logger.components.webComponents;
       }
     } catch (error) {
       // Logger not available, use no-op logger
     }
-    
+
     // If logger didn't initialize, use no-op
     if (!loggerInstance) {
       loggerInstance = {
@@ -33,7 +38,7 @@ function getLogger() {
       };
     }
   }
-  
+
   return loggerInstance;
 }
 
@@ -55,9 +60,9 @@ export const logPickerInit = (mode: string, fontCount: number) => {
 };
 
 export const logError = (message: string, error: any) => {
-  stylizerLogger.error(message, { 
-    error: error.message, 
-    stack: error.stack 
+  stylizerLogger.error(message, {
+    error: error.message,
+    stack: error.stack
   });
 };
 

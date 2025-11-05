@@ -12,6 +12,9 @@ declare module '@crimsonsunset/jsg-logger' {
 
   export interface JSGLoggerConfig {
     configPath?: string;
+    devtools?: {
+      enabled?: boolean;
+    };
     [key: string]: any;
   }
 

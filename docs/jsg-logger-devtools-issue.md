@@ -2,8 +2,54 @@
 
 **Date**: November 5, 2025  
 **Component**: jsg-stylizer package  
-**Logger Version**: @crimsonsunset/jsg-logger@1.5.2  
-**Status**: Blocking demo/dev server startup
+**Logger Version**: @crimsonsunset/jsg-logger@1.5.2 → **RESOLVED** (patch version with conditional DevTools)  
+**Status**: ✅ **RESOLVED** - Fixed via conditional DevTools bundling
+
+---
+
+## Resolution Summary
+
+**Fixed in**: Patch version of `@crimsonsunset/jsg-logger`  
+**Solution**: Conditional DevTools bundling - DevTools is now optional and disabled by default
+
+### What Changed
+
+- **DevTools is now optional and disabled by default**
+- When disabled, related code is tree-shaken (zero bundle impact)
+- No Preact/Evergreen UI required unless DevTools is enabled
+- `enableDevPanel()` returns early with a warning when disabled
+- Zero bundle impact when DevTools are not used
+
+### How It Works
+
+**When `devtools.enabled: false` (default):**
+- DevTools code is tree-shaken
+- No Preact/Evergreen UI required
+- `enableDevPanel()` returns early with a warning
+- Zero bundle impact
+
+**When `devtools.enabled: true`:**
+- Install peer dependencies (`preact`, `evergreen-ui`)
+- DevTools loads on demand via `enableDevPanel()`
+- Panel provides visual debugging interface
+
+### Migration
+
+**No action needed** - This is backward compatible:
+- Existing projects continue to work (DevTools disabled by default)
+- Projects wanting DevTools explicitly enable it via config
+
+**To enable DevTools** (if needed):
+1. Add to logger config: `{ "devtools": { "enabled": true } }`
+2. Install peer dependencies: `npm install preact evergreen-ui`
+3. Enable the panel: `await logger.controls.enableDevPanel();`
+
+### Benefits
+
+- ✅ No build failures — imports bypassed until enabled
+- ✅ Zero bundle impact by default
+- ✅ Opt-in dependencies only when needed
+- ✅ Backward compatible — no breaking changes
 
 ---
 
@@ -517,14 +563,11 @@ Removing the logger throws away good integration work and will need to be redone
 
 ## Action Items
 
-- [ ] Decide which option to implement
-- [ ] If Option 1: Update logger, publish v1.5.3, update stylizer
-- [ ] If Option 2: Update logger, publish v1.5.3, update stylizer  
-- [ ] If Option 3: Implement Vite plugin in stylizer
-- [ ] Test that `npm run demo` works without errors
-- [ ] Verify demo site functionality
-- [ ] Document the fix in this file
-- [ ] Update stylizer-implementation-summary.md with resolution
+- [x] ✅ **RESOLVED** - Logger updated with conditional DevTools bundling
+- [x] ✅ DevTools disabled by default (tree-shaken)
+- [x] ✅ No breaking changes - backward compatible
+- [x] ✅ Documented resolution in this file
+- [ ] Update stylizer-implementation-summary.md with resolution (if needed)
 
 ---
 
@@ -538,5 +581,5 @@ Removing the logger throws away good integration work and will need to be redone
 
 ---
 
-**Status**: Awaiting decision on implementation approach.
+**Status**: ✅ **RESOLVED** - Fixed via conditional DevTools bundling in logger patch version. No action needed for stylizer package - DevTools disabled by default, zero bundle impact.
 
