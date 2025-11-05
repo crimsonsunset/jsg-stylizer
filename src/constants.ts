@@ -69,6 +69,11 @@ export const DEFAULT_CONFIG = {
   cssVariableSecondary: "--font-secondary",
 };
 
+// Default button configuration
+export const DEFAULT_BUTTON_CONFIG = {
+  preset: 'icon' as const,
+};
+
 // JSFontPicker base config
 export const FONT_PICKER_CONFIG = {
   language: "en",

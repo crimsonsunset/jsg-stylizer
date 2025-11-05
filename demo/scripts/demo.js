@@ -43,72 +43,28 @@ tabs.forEach(tab => {
 // Listen to Stylizer font changes
 const stylizer = document.querySelector('jsg-stylizer');
 if (stylizer) {
-  // Customize the button after component loads
-  setTimeout(() => {
-    const shadowRoot = stylizer.shadowRoot;
-    if (shadowRoot) {
-      const toggleBtn = shadowRoot.querySelector('.toggle-btn');
-      if (toggleBtn) {
-        // Get computed CSS variable values
-        const rootStyles = getComputedStyle(document.documentElement);
-        const accentColor = rootStyles.getPropertyValue('--accent').trim() || '#3b82f6';
-        const primaryFont = rootStyles.getPropertyValue('--font-primary').trim() || '"Inter", sans-serif';
-
-        // Hide SVG icon and add text
-        toggleBtn.textContent = 'Click here to change fonts';
-
-        // Style the button
-        toggleBtn.style.background = accentColor;
-        toggleBtn.style.color = 'white';
-        toggleBtn.style.border = `2px solid ${accentColor}`;
-        toggleBtn.style.borderRadius = '0.5rem';
-        toggleBtn.style.padding = '0.75rem 1.5rem';
-        toggleBtn.style.fontFamily = primaryFont;
-        toggleBtn.style.fontWeight = '600';
-        toggleBtn.style.fontSize = '1rem';
-        toggleBtn.style.cursor = 'pointer';
-        toggleBtn.style.transition = 'all 0.2s';
-
-        // Add hover effect
-        toggleBtn.addEventListener('mouseenter', () => {
-          toggleBtn.style.transform = 'translateY(-2px)';
-          // Use a semi-transparent version of the accent color
-          if (accentColor.startsWith('#')) {
-            const hex = accentColor.slice(1);
-            const r = parseInt(hex.slice(0, 2), 16);
-            const g = parseInt(hex.slice(2, 4), 16);
-            const b = parseInt(hex.slice(4, 6), 16);
-            toggleBtn.style.boxShadow = `0 4px 12px rgba(${r}, ${g}, ${b}, 0.3)`;
-          } else {
-            toggleBtn.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
-          }
-        });
-
-        toggleBtn.addEventListener('mouseleave', () => {
-          toggleBtn.style.transform = 'translateY(0)';
-          toggleBtn.style.boxShadow = 'none';
-        });
-      }
-    }
-  }, 100);
-
+  // Configure button via buttonConfig property
+  stylizer.buttonConfig = {
+    preset: 'primary',
+    text: 'Click here to change fonts'
+  };
+  
   stylizer.addEventListener('font-changed', (e) => {
     console.log('Font changed:', e.detail);
-
+    
     // Update demo text to show the change
     const { fontType, fontFamily } = e.detail;
     if (fontType === 'primary') {
-      document.getElementById('demo-primary').textContent = `Primary Font: ${fontFamily}`;
+      document.getElementById('demo-primary').textContent = `this is your primary font`;
     } else {
-      document.getElementById('demo-secondary').textContent = `Secondary Font: ${fontFamily}`;
+      document.getElementById('demo-secondary').textContent = `this is your secondary font`;
     }
   });
-
+  
   stylizer.addEventListener('font-reset', (e) => {
-    const { fontType, fontFamily } = e.detail;
     console.log('Fonts reset:', e.detail);
-    document.getElementById('demo-primary').textContent = `Primary Font: ${fontFamily}`;
-    document.getElementById('demo-secondary').textContent = `Secondary Font: ${fontFamily}`;
+    document.getElementById('demo-primary').textContent = 'this is your primary font';
+    document.getElementById('demo-secondary').textContent = 'this is your secondary font';
   });
 }
 

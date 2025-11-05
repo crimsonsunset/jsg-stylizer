@@ -2,24 +2,21 @@
  * Stylizer Web Component - Universal Font Picker
  */
 
-import type { ComponentState, FontMode, FontType, ThemeConfig, FontChangedEventDetail, FontResetEventDetail } from './types';
-import { CURATED_FONTS, SYSTEM_FONTS, DEFAULT_CONFIG, FONT_PICKER_CONFIG } from './constants';
+import type { ComponentState, FontMode, FontType, ThemeConfig, FontChangedEventDetail, FontResetEventDetail, ButtonConfig } from './types';
+import { CURATED_FONTS, SYSTEM_FONTS, DEFAULT_CONFIG, FONT_PICKER_CONFIG, DEFAULT_BUTTON_CONFIG } from './constants';
 import { createTemplate } from './template';
 import { shadowStyles, globalStyles } from './Stylizer.styles';
 import JSGLogger from '@crimsonsunset/jsg-logger';
 
 // Initialize logger once at module level
-const loggerInstance = JSGLogger.getInstance({
+// Use getInstanceSync for synchronous access - getComponent is always available
+const loggerInstance = JSGLogger.getInstanceSync({
   devtools: { enabled: true }
 });
 
-// Get logger synchronously for module-level use
-// Logger package now always returns a logger instance (no-op if unavailable)
-const getLogger = () => {
-  const instance = loggerInstance as any;
-  // components are factory functions that always return a logger instance
-  return instance?.components?.webComponents?.() || instance?.getComponent?.('webComponents');
-};
+// Cache webComponents logger - getComponent always returns a logger instance
+// Called once at module load, safe because getComponent handles all edge cases
+const webComponentsLogger = loggerInstance.getComponent('webComponents');
 
 export class StylizerElement extends HTMLElement {
   // Shadow root
@@ -40,6 +37,9 @@ export class StylizerElement extends HTMLElement {
   // DOM refs
   private buttonRef: HTMLElement | null = null;
   
+  // Private properties
+  private _buttonConfig: ButtonConfig = { ...DEFAULT_BUTTON_CONFIG };
+  
   // Properties
   public curatedFonts: string[] = CURATED_FONTS;
   public systemFonts: string[] = SYSTEM_FONTS;
@@ -51,6 +51,18 @@ export class StylizerElement extends HTMLElement {
     surface: '--surface',
     textSecondary: '--text-secondary'
   };
+  
+  get buttonConfig(): ButtonConfig {
+    return this._buttonConfig;
+  }
+  
+  set buttonConfig(value: ButtonConfig) {
+    this._buttonConfig = { ...value };
+    // Trigger re-render if component is already connected
+    if (this.isConnected) {
+      this.render();
+    }
+  }
   
   static get observedAttributes() {
     return [
@@ -80,7 +92,7 @@ export class StylizerElement extends HTMLElement {
   }
   
   connectedCallback() {
-    getLogger().debug('Stylizer connected to DOM');
+    webComponentsLogger.debug('Stylizer connected to DOM');
     
     // Inject global styles for JSFontPicker
     this.injectGlobalStyles();
@@ -98,7 +110,7 @@ export class StylizerElement extends HTMLElement {
   }
   
   disconnectedCallback() {
-    getLogger().debug('Stylizer disconnected from DOM');
+    webComponentsLogger.debug('Stylizer disconnected from DOM');
     
     // Cleanup JSFontPicker
     if (this.fontPickerInstance) {
@@ -116,7 +128,7 @@ export class StylizerElement extends HTMLElement {
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (oldValue === newValue) return;
     
-      getLogger().debug('Attribute changed', { name, oldValue, newValue });
+    webComponentsLogger.debug('Attribute changed', { name, oldValue, newValue });
     
     // Handle attribute changes
     switch (name) {
@@ -165,8 +177,24 @@ export class StylizerElement extends HTMLElement {
     const styleEl = document.createElement('style');
     styleEl.textContent = shadowStyles;
     
+    // Handle custom button element
+    let customButtonElement: HTMLElement | null = null;
+    let buttonConfigToUse = { ...this.buttonConfig };
+    
+    if (this.buttonConfig.customElement) {
+      // Clone the custom element to avoid moving the original
+      customButtonElement = this.buttonConfig.customElement.cloneNode(true) as HTMLElement;
+      // Ensure it has the toggle-btn class for event listener attachment
+      customButtonElement.classList.add('toggle-btn');
+      // Preserve any aria-label or title
+      if (this.buttonConfig.ariaLabel) {
+        customButtonElement.setAttribute('aria-label', this.buttonConfig.ariaLabel);
+        customButtonElement.setAttribute('title', this.buttonConfig.ariaLabel);
+      }
+    }
+    
     // Generate template
-    const template = createTemplate(this.state);
+    const template = createTemplate(this.state, buttonConfigToUse);
     
     // Update shadow DOM
     this.shadowRoot.innerHTML = '';
@@ -174,7 +202,16 @@ export class StylizerElement extends HTMLElement {
     
     const container = document.createElement('div');
     container.innerHTML = template;
-    this.shadowRoot.appendChild(container.firstElementChild!);
+    const rootElement = container.firstElementChild!;
+    this.shadowRoot.appendChild(rootElement);
+    
+    // Replace button with custom element if provided
+    if (customButtonElement) {
+      const toggleBtn = this.shadowRoot.querySelector('.toggle-btn');
+      if (toggleBtn && customButtonElement) {
+        toggleBtn.replaceWith(customButtonElement);
+      }
+    }
     
     // Reattach event listeners after render
     this.attachEventListeners();
@@ -217,7 +254,7 @@ export class StylizerElement extends HTMLElement {
    */
   private handleToggleClick() {
     this.state.isOpen = !this.state.isOpen;
-      getLogger().debug('Toggle clicked', { isOpen: this.state.isOpen });
+    webComponentsLogger.debug('Toggle clicked', { isOpen: this.state.isOpen });
     this.render();
   }
   
@@ -237,7 +274,7 @@ export class StylizerElement extends HTMLElement {
     
     if (tab && tab !== this.state.fontType) {
       this.state.fontType = tab;
-      getLogger().debug('Tab changed', { fontType: tab });
+      webComponentsLogger.debug('Tab changed', { fontType: tab });
       this.render();
       
       // Recreate picker for new font type
@@ -257,7 +294,7 @@ export class StylizerElement extends HTMLElement {
     
     if (!newMode) return;
     
-    getLogger().debug('Mode button clicked', { currentMode: this.state.mode, newMode });
+    webComponentsLogger.debug('Mode button clicked', { currentMode: this.state.mode, newMode });
     
     // If same mode, just open the picker
     if (this.state.mode === newMode && this.fontPickerInstance) {
@@ -289,7 +326,7 @@ export class StylizerElement extends HTMLElement {
    * Handle reset button click
    */
   private handleResetClick() {
-    getLogger().debug('Reset clicked');
+    webComponentsLogger.debug('Reset clicked');
     this.reset();
   }
   
@@ -325,7 +362,7 @@ export class StylizerElement extends HTMLElement {
         // Browse All mode - load all fonts
         const apiKey = this.googleApiKey;
         if (!apiKey) {
-          getLogger().warn('Browse All mode requires API key');
+          webComponentsLogger.warn('Browse All mode requires API key');
           return;
         }
         config.googleFonts = null; // null = all fonts
@@ -353,12 +390,12 @@ export class StylizerElement extends HTMLElement {
       
       this.fontPickerInstance = picker;
       
-      getLogger().info('Picker initialized', {
+      webComponentsLogger.info('Picker initialized', {
         mode: this.state.mode,
         fontCount: this.state.mode === 'curated' ? this.curatedFonts.length : 'all'
       });
     } catch (error) {
-      getLogger().error('Failed to initialize FontPicker', error);
+      webComponentsLogger.error('Failed to initialize FontPicker', error);
     }
   }
   
@@ -386,7 +423,7 @@ export class StylizerElement extends HTMLElement {
     // Re-render to show updated font name
     this.render();
     
-    getLogger().info('Font applied', {
+    webComponentsLogger.info('Font applied', {
       fontType: this.state.fontType,
       fontFamily,
       cssVariable
@@ -443,7 +480,7 @@ export class StylizerElement extends HTMLElement {
     
     this.render();
     
-    getLogger().info('Fonts reset', {
+    webComponentsLogger.info('Fonts reset', {
       primaryFont: this.defaultPrimaryFont,
       secondaryFont: this.defaultSecondaryFont
     });

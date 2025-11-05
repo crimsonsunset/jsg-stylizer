@@ -209,7 +209,29 @@ stylizer.themeCSSVariables = {
   surface: '--my-surface-color',
   textSecondary: '--my-secondary-text'
 };
+
+// Configure launch button appearance
+stylizer.buttonConfig = {
+  preset: 'primary',              // 'icon' | 'text' | 'primary' | 'secondary'
+  text: 'Click here to change fonts',  // Required for text-based presets
+  ariaLabel: 'Custom Font Picker'  // Optional custom aria-label
+};
+
+// Or use a custom button element
+const customBtn = document.createElement('button');
+customBtn.textContent = '🎨 Fonts';
+customBtn.className = 'my-custom-btn';
+stylizer.buttonConfig = {
+  customElement: customBtn,
+  ariaLabel: 'Font Picker'
+};
 ```
+
+**Button Presets:**
+- `'icon'` (default) - Small icon button with plus icon, transparent background
+- `'text'` - Text button with transparent background, requires `text` property
+- `'primary'` - Primary button style with accent background, white text, requires `text` property
+- `'secondary'` - Secondary button style with transparent background, accent border, requires `text` property
 
 ### Methods
 

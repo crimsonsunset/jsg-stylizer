@@ -2,20 +2,52 @@
  * HTML template generation for Stylizer Web Component
  */
 
-import type { ComponentState } from './types';
+import type { ComponentState, ButtonConfig } from './types';
+
+/**
+ * Generate button HTML based on button configuration
+ */
+function generateButtonHTML(config: ButtonConfig): string {
+  const preset = config.preset || 'icon';
+  const ariaLabel = config.ariaLabel || 'Font Picker';
+  const title = config.ariaLabel || 'Font Picker';
+  
+  let buttonClasses = 'toggle-btn';
+  let buttonContent = '';
+  
+  if (preset === 'icon') {
+    buttonClasses += ' toggle-btn-preset-icon';
+    buttonContent = `
+      <svg width="20" height="20" viewBox="0 0 512 512" fill="currentColor">
+        <path d="M208 48a16 16 0 00-16 16v64H80a16 16 0 00-16 16v32a16 16 0 0016 16h112v304a16 16 0 0016 16h32a16 16 0 0016-16V192h112a16 16 0 0016-16v-32a16 16 0 00-16-16H256V64a16 16 0 00-16-16z"/>
+      </svg>
+    `;
+  } else if (preset === 'text') {
+    buttonClasses += ' toggle-btn-preset-text';
+    buttonContent = config.text || 'Font Picker';
+  } else if (preset === 'primary') {
+    buttonClasses += ' toggle-btn-preset-primary';
+    buttonContent = config.text || 'Font Picker';
+  } else if (preset === 'secondary') {
+    buttonClasses += ' toggle-btn-preset-secondary';
+    buttonContent = config.text || 'Font Picker';
+  }
+  
+  return `
+    <button class="${buttonClasses}" aria-label="${ariaLabel}" title="${title}">
+      ${buttonContent}
+    </button>
+  `;
+}
 
 /**
  * Generate the component's HTML template
  */
-export function createTemplate(state: ComponentState): string {
+export function createTemplate(state: ComponentState, buttonConfig: ButtonConfig): string {
   return `
     <div class="stylizer-container">
       <!-- Toggle Button -->
-      <button class="toggle-btn" aria-label="Font Picker" title="Font Picker">
-        <svg width="20" height="20" viewBox="0 0 512 512" fill="currentColor">
-          <path d="M208 48a16 16 0 00-16 16v64H80a16 16 0 00-16 16v32a16 16 0 0016 16h112v304a16 16 0 0016 16h32a16 16 0 0016-16V192h112a16 16 0 0016-16v-32a16 16 0 00-16-16H256V64a16 16 0 00-16-16z"/>
-        </svg>
-      </button>
+      ${generateButtonHTML(buttonConfig)}
       
       ${state.isOpen ? `
         <!-- Backdrop -->

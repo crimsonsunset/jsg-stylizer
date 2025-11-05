@@ -38,7 +38,7 @@ export const shadowStyles = `
     border: none;
     cursor: pointer;
     color: var(--text);
-    transition: background-color 0.2s;
+    transition: all 0.2s;
   }
   
   .toggle-btn:hover {
@@ -48,6 +48,51 @@ export const shadowStyles = `
   .toggle-btn:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
+  }
+  
+  /* Button Presets */
+  .toggle-btn-preset-icon {
+    /* Default icon button - no additional styles needed */
+  }
+  
+  .toggle-btn-preset-text {
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: none;
+    font-weight: 500;
+  }
+  
+  .toggle-btn-preset-text:hover {
+    background-color: var(--surface);
+  }
+  
+  .toggle-btn-preset-primary {
+    padding: 0.75rem 1.5rem;
+    background: var(--accent);
+    color: white;
+    border: 2px solid var(--accent);
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  
+  .toggle-btn-preset-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    background-color: var(--accent);
+  }
+  
+  .toggle-btn-preset-secondary {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  
+  .toggle-btn-preset-secondary:hover {
+    background: var(--accent);
+    color: white;
   }
   
   /* Backdrop */

@@ -33,6 +33,13 @@ export interface FontResetEventDetail {
   secondaryFont: string;
 }
 
+export interface ButtonConfig {
+  preset?: 'icon' | 'text' | 'primary' | 'secondary';
+  text?: string;
+  customElement?: HTMLElement;
+  ariaLabel?: string;
+}
+
 export interface StylizerAttributes {
   'is-development'?: string | boolean;
   'default-primary-font'?: string;
@@ -57,6 +64,7 @@ export interface StylizerElement extends HTMLElement {
   curatedFonts: string[];
   systemFonts: string[];
   themeCSSVariables: ThemeConfig;
+  buttonConfig: ButtonConfig;
   
   // Methods
   open(): void;
@@ -65,11 +73,6 @@ export interface StylizerElement extends HTMLElement {
 }
 
 // Note: JSX.IntrinsicElements for 'jsg-stylizer' is declared in src/env.d.ts
-// This file only defines the HTMLElementTagNameMap for DOM API support
-declare global {
-  interface HTMLElementTagNameMap {
-    'jsg-stylizer': StylizerElement;
-  }
-}
+// HTMLElementTagNameMap is also declared there to avoid conflicts
 
 
