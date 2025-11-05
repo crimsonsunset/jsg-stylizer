@@ -16,9 +16,11 @@
 
 import { StylizerElement } from './Stylizer';
 
-// Register custom element
-if (!customElements.get('jsg-stylizer')) {
-  customElements.define('jsg-stylizer', StylizerElement);
+// Register custom element only in browser environment
+if (typeof window !== 'undefined' && typeof customElements !== 'undefined') {
+  if (!customElements.get('jsg-stylizer')) {
+    customElements.define('jsg-stylizer', StylizerElement);
+  }
 }
 
 // Export for type safety and direct usage

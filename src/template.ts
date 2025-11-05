@@ -2,7 +2,7 @@
  * HTML template generation for Stylizer Web Component
  */
 
-import { ComponentState } from './types';
+import type { ComponentState } from './types';
 
 /**
  * Generate the component's HTML template

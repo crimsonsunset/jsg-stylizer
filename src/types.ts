@@ -64,14 +64,9 @@ export interface StylizerElement extends HTMLElement {
   reset(): void;
 }
 
-// Global type augmentation for TypeScript
+// Note: JSX.IntrinsicElements for 'jsg-stylizer' is declared in src/env.d.ts
+// This file only defines the HTMLElementTagNameMap for DOM API support
 declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'jsg-stylizer': StylizerAttributes & React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
-    }
-  }
-  
   interface HTMLElementTagNameMap {
     'jsg-stylizer': StylizerElement;
   }

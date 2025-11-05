@@ -9,14 +9,14 @@ export default defineConfig({
       formats: ['es', 'umd'],
       fileName: (format) => `index.${format === 'es' ? 'esm' : format}.js`
     },
-    rollupOptions: {
-      external: ['@crimsonsunset/jsg-logger'],
-      output: {
-        globals: {
-          '@crimsonsunset/jsg-logger': 'JSGLogger'
-        }
-      }
-    },
+    // rollupOptions: {
+    //   external: ['@crimsonsunset/jsg-logger'],
+    //   output: {
+    //     globals: {
+    //       '@crimsonsunset/jsg-logger': 'JSGLogger'
+    //     }
+    //   }
+    // },
     sourcemap: true,
     minify: 'esbuild'
   },

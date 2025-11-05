@@ -2,18 +2,21 @@
 
 **Date**: November 5, 2025  
 **Component**: jsg-stylizer package  
-**Logger Version**: @crimsonsunset/jsg-logger@1.5.5 (updated from 1.5.2)  
-**Status**: ✅ **RESOLVED** - Fixed via conditional DevTools bundling
+**Logger Version**: @crimsonsunset/jsg-logger@1.7.0 (updated from 1.5.2)  
+**Status**: ✅ **RESOLVED** - Fixed via config-driven tree-shaking
 
 ---
 
 ## Resolution Summary
 
 **Fixed in**: Patch version of `@crimsonsunset/jsg-logger` (v1.5.2+)  
-**Solution**: Conditional DevTools bundling - DevTools is now optional and disabled by default
+**Solution**: Config-driven tree-shaking - DevTools is now optional and disabled by default
 
-**Updated to**: v1.5.5 (January 2025)  
+**Updated to**: v1.7.0 (January 2025)  
 **New Features**:
+- Config-driven tree-shaking based on default config
+- Comprehensive logging throughout DevTools lifecycle
+- Simplified import strategy (relative paths)
 - `window.JSG_Logger` automatically exposed when calling `getInstance()` (previously only with `getInstanceSync()`)
 - DevTools panel duplicate prevention bug fix
 
@@ -27,17 +30,24 @@
 
 ### How It Works
 
+**Config-driven tree-shaking (v1.7.0):**
+- Tree-shaking determined by `defaultConfig.devtools.enabled` at module load time
+- When `false` (default): DevTools code completely tree-shaken (zero bundle impact)
+- When `true` (runtime config): DevTools loads dynamically on demand
+- Comprehensive logging shows config loading and DevTools activation flow
+
 **When `devtools.enabled: false` (default):**
-- DevTools code is tree-shaken
+- DevTools code is tree-shaken at module load time (based on default config)
 - No Preact/Evergreen UI required
 - `enableDevPanel()` returns early with a warning
 - Zero bundle impact
 
-**When `devtools.enabled: true`:**
-- DevTools loads on demand via `enableDevPanel()`
+**When `devtools.enabled: true` (runtime config):**
+- DevTools loads dynamically on demand via `enableDevPanel()`
 - Panel is self-contained with all dependencies bundled (no npm installs needed)
 - Bundle size: ~81KB gzipped (includes Preact + Evergreen UI)
 - Panel provides visual debugging interface
+- Comprehensive logging shows config loading and DevTools activation flow
 
 ### Migration
 
@@ -54,11 +64,13 @@
 ### Benefits
 
 - ✅ No build failures — imports bypassed until enabled
-- ✅ Zero bundle impact by default
+- ✅ Zero bundle impact by default (tree-shaken based on default config)
 - ✅ Self-contained when enabled — no peer dependencies needed
 - ✅ Backward compatible — no breaking changes
-- ✅ Fixed module resolution — uses package export path for proper loading from node_modules
+- ✅ Simplified import strategy — uses relative paths (no complex path resolution)
 - ✅ Bundled dependencies — Preact and Evergreen UI included (no resolution issues)
+- ✅ Enhanced logging — comprehensive visibility into config loading and DevTools activation
+- ✅ No special Vite config needed — works out of the box (only `server.fs.allow: ['..']` needed for npm link dev)
 
 ---
 

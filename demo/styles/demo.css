@@ -70,6 +70,7 @@ body {
 }
 
 .logo {
+  font-family: var(--font-secondary);
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text);
@@ -109,6 +110,7 @@ body {
 }
 
 .hero-title {
+  font-family: var(--font-primary);
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 1rem;
@@ -116,6 +118,7 @@ body {
 }
 
 .hero-subtitle {
+  font-family: var(--font-secondary);
   font-size: 1.25rem;
   color: var(--text-secondary);
   margin-bottom: 2rem;
@@ -129,6 +132,7 @@ body {
 }
 
 .btn {
+  font-family: var(--font-secondary);
   padding: 0.75rem 1.5rem;
   border-radius: 0.5rem;
   font-weight: 600;
@@ -178,19 +182,15 @@ body {
 .demo-subtitle {
   font-family: var(--font-secondary);
   font-size: 1.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
   color: var(--accent);
-}
-
-.demo-text {
-  font-size: 1rem;
-  margin-bottom: 1.5rem;
-  color: var(--text-secondary);
 }
 
 .demo-stylizer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
 }
 
 /* Section */
@@ -235,6 +235,7 @@ body {
 }
 
 .feature-card h3 {
+  font-family: var(--font-secondary);
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
@@ -254,6 +255,7 @@ body {
 }
 
 .tab {
+  font-family: var(--font-secondary);
   padding: 0.75rem 1.5rem;
   border: none;
   background: transparent;
@@ -318,12 +320,14 @@ code {
 }
 
 .install-card h3 {
+  font-family: var(--font-secondary);
   margin-bottom: 1rem;
   font-size: 1.5rem;
 }
 
 /* Footer */
 .footer {
+  font-family: var(--font-secondary);
   border-top: 1px solid var(--border);
   padding: 2rem 0;
   text-align: center;

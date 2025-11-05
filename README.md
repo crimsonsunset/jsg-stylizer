@@ -321,7 +321,7 @@ Contributions welcome! Please open an issue or PR.
 ## 🔗 Links
 
 - [Demo Site](https://stylizer-demo.netlify.app)
-- [GitHub Repository](https://github.com/yourusername/jsg-stylizer)
+- [GitHub Repository](https://github.com/crimsonsunset/jsg-stylizer)
 - [JSFontPicker](https://www.jsfontpicker.com/) (underlying font picker library)
 - [JSG Logger](https://www.npmjs.com/package/@crimsonsunset/jsg-logger)
 
