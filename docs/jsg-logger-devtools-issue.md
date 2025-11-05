@@ -34,8 +34,9 @@
 - Zero bundle impact
 
 **When `devtools.enabled: true`:**
-- Install peer dependencies (`preact`, `evergreen-ui`)
 - DevTools loads on demand via `enableDevPanel()`
+- Panel is self-contained with all dependencies bundled (no npm installs needed)
+- Bundle size: ~81KB gzipped (includes Preact + Evergreen UI)
 - Panel provides visual debugging interface
 
 ### Migration
@@ -43,18 +44,21 @@
 **No action needed** - This is backward compatible:
 - Existing projects continue to work (DevTools disabled by default)
 - Projects wanting DevTools explicitly enable it via config
+- No peer dependencies required - DevTools panel is self-contained
 
 **To enable DevTools** (if needed):
 1. Add to logger config: `{ "devtools": { "enabled": true } }`
-2. Install peer dependencies: `npm install preact evergreen-ui`
-3. Enable the panel: `await logger.controls.enableDevPanel();`
+2. Enable the panel: `await logger.controls.enableDevPanel();`
+3. No additional npm installs required - all dependencies are bundled
 
 ### Benefits
 
 - ✅ No build failures — imports bypassed until enabled
 - ✅ Zero bundle impact by default
-- ✅ Opt-in dependencies only when needed
+- ✅ Self-contained when enabled — no peer dependencies needed
 - ✅ Backward compatible — no breaking changes
+- ✅ Fixed module resolution — uses package export path for proper loading from node_modules
+- ✅ Bundled dependencies — Preact and Evergreen UI included (no resolution issues)
 
 ---
 
@@ -582,7 +586,7 @@ Removing the logger throws away good integration work and will need to be redone
 
 - `/Users/joe/Desktop/Repos/Personal/jsg-tech-check-site/jsg-stylizer/package.json`
 - `/Users/joe/Desktop/Repos/Personal/jsg-tech-check-site/jsg-stylizer/vite.config.ts`
-- `/Users/joe/Desktop/Repos/Personal/jsg-tech-check-site/jsg-stylizer/src/logger-utils.ts`
+- `/Users/joe/Desktop/Repos/Personal/jsg-tech-check-site/jsg-stylizer/src/Stylizer.ts`
 - `/Users/joe/Desktop/Repos/Personal/jsg-tech-check-site/jsg-stylizer/node_modules/@crimsonsunset/jsg-logger/index.js`
 - `/Users/joe/Desktop/Repos/Personal/jsg-tech-check-site/jsg-stylizer/node_modules/@crimsonsunset/jsg-logger/package.json`
 
@@ -622,4 +626,102 @@ const logger = JSGLogger.getInstance({ devtools: { enabled: true } });
 - ✅ Consistent behavior - same automatic exposure as `getInstanceSync()`
 - ✅ Bug fix - DevTools panel duplicate prevention
 - ✅ Backward compatible - manual assignment still works (but redundant)
+
+---
+
+## Logger Wrapper Cleanup (November 5, 2025)
+
+### Summary
+
+Removed the overcomplicated `logger-utils.ts` wrapper file (~130 lines) and replaced it with direct JSG Logger usage in `Stylizer.ts`. This simplifies the codebase significantly and eliminates unnecessary async initialization complexity.
+
+### Changes Made
+
+**1. Updated `src/Stylizer.ts`**
+- Removed: `import { stylizerLogger, logDebug, logError } from './logger-utils';`
+- Added: Direct JSG Logger import and simple module-level initialization:
+```typescript
+import JSGLogger from '@crimsonsunset/jsg-logger';
+
+const logger = JSGLogger.getInstance({
+  devtools: { enabled: true }
+}).components?.webComponents || {
+  info: () => {},
+  debug: () => {},
+  warn: () => {},
+  error: () => {}
+};
+```
+- Replaced all wrapper calls:
+  - `logDebug(...)` → `logger.debug(...)` (7 instances)
+  - `logError(...)` → `logger.error(...)` (1 instance)
+  - `stylizerLogger.info(...)` → `logger.info(...)` (3 instances)
+  - `stylizerLogger.warn(...)` → `logger.warn(...)` (1 instance)
+
+**2. Deleted `src/logger-utils.ts`**
+- Removed entire file (~130 lines)
+- Eliminated unnecessary wrapper code:
+  - Async lazy initialization
+  - Singleton pattern
+  - Proxy wrapper object
+  - Convenience functions
+  - DevTools handling complexity
+  - No-op fallback logic
+
+**3. Updated `demo/scripts/demo.js`**
+- Fixed warning message reference
+
+### Why This Was Needed
+
+The `logger-utils.ts` file was overly complex with unnecessary abstractions:
+- Async initialization wrapper (unnecessary - JSG Logger handles this)
+- Singleton pattern (JSG Logger is already a singleton)
+- Proxy wrapper object (just adds indirection)
+- Multiple convenience functions (can call logger directly)
+- Complex DevTools handling (JSG Logger v1.5.5 handles automatically)
+
+JSG Logger v1.5.5 automatically:
+- Exposes `window.JSG_Logger` when `getInstance()` is called
+- Handles initialization internally
+- Supports direct usage without wrappers
+
+### Benefits
+
+- ✅ **Simpler code** - Removed ~130 lines of unnecessary wrapper code
+- ✅ **Easier to understand** - Direct logger usage, no indirection
+- ✅ **No async complexity** - Synchronous initialization at module level
+- ✅ **Better maintainability** - Less code to maintain
+- ✅ **Same functionality** - All logging features preserved
+
+### Migration Notes
+
+**Before:**
+```typescript
+import { stylizerLogger, logDebug, logError } from './logger-utils';
+
+logDebug('Message');
+stylizerLogger.info('Info', data);
+logError('Error', error);
+```
+
+**After:**
+```typescript
+import JSGLogger from '@crimsonsunset/jsg-logger';
+
+const logger = JSGLogger.getInstance({
+  devtools: { enabled: true }
+}).components?.webComponents || { /* no-op */ };
+
+logger.debug('Message');
+logger.info('Info', data);
+logger.error('Error', error);
+```
+
+### Verification
+
+- ✅ TypeScript compilation passes
+- ✅ Build succeeds
+- ✅ No linting errors
+- ✅ All logger calls replaced correctly
+- ✅ Logger initialization works correctly
 

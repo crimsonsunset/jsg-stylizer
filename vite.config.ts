@@ -22,17 +22,23 @@ export default defineConfig({
     minify: 'esbuild'
   },
   optimizeDeps: {
-    // Exclude logger from dep optimization to avoid devtools import issues
-    exclude: ['@crimsonsunset/jsg-logger']
+    // Exclude logger and devtools from dep optimization to avoid import issues
+    exclude: [
+      '@crimsonsunset/jsg-logger',
+      '@crimsonsunset/jsg-logger/devtools'
+    ]
   },
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src')
-    }
+    },
+    // Preserve symlinks for npm link to work correctly
+    preserveSymlinks: true
   },
   server: {
     fs: {
-      allow: ['..']
+      // Allow serving files from parent directories and linked packages
+      allow: ['..', '../..']
     }
   }
 });
