@@ -4,9 +4,19 @@
 
 import { ComponentState, FontMode, FontType, ThemeConfig, FontChangedEventDetail, FontResetEventDetail } from './types';
 import { CURATED_FONTS, SYSTEM_FONTS, DEFAULT_CONFIG, FONT_PICKER_CONFIG } from './constants';
-import { stylizerLogger, logDebug, logError } from './logger-utils';
 import { createTemplate } from './template';
 import { shadowStyles, globalStyles } from './Stylizer.styles';
+import JSGLogger from '@crimsonsunset/jsg-logger';
+
+// Initialize logger once at module level
+const logger = JSGLogger.getInstance({
+  devtools: { enabled: true }
+}).components?.webComponents || {
+  info: () => {},
+  debug: () => {},
+  warn: () => {},
+  error: () => {}
+};
 
 export class StylizerElement extends HTMLElement {
   // Shadow root
@@ -67,7 +77,7 @@ export class StylizerElement extends HTMLElement {
   }
   
   connectedCallback() {
-    logDebug('Stylizer connected to DOM');
+    logger.debug('Stylizer connected to DOM');
     
     // Inject global styles for JSFontPicker
     this.injectGlobalStyles();
@@ -85,7 +95,7 @@ export class StylizerElement extends HTMLElement {
   }
   
   disconnectedCallback() {
-    logDebug('Stylizer disconnected from DOM');
+    logger.debug('Stylizer disconnected from DOM');
     
     // Cleanup JSFontPicker
     if (this.fontPickerInstance) {
@@ -103,7 +113,7 @@ export class StylizerElement extends HTMLElement {
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (oldValue === newValue) return;
     
-    logDebug('Attribute changed', { name, oldValue, newValue });
+    logger.debug('Attribute changed', { name, oldValue, newValue });
     
     // Handle attribute changes
     switch (name) {
@@ -193,7 +203,7 @@ export class StylizerElement extends HTMLElement {
    */
   private handleToggleClick() {
     this.state.isOpen = !this.state.isOpen;
-    logDebug('Toggle clicked', { isOpen: this.state.isOpen });
+    logger.debug('Toggle clicked', { isOpen: this.state.isOpen });
     this.render();
   }
   
@@ -213,7 +223,7 @@ export class StylizerElement extends HTMLElement {
     
     if (tab && tab !== this.state.fontType) {
       this.state.fontType = tab;
-      logDebug('Tab changed', { fontType: tab });
+      logger.debug('Tab changed', { fontType: tab });
       this.render();
       
       // Recreate picker for new font type
@@ -233,7 +243,7 @@ export class StylizerElement extends HTMLElement {
     
     if (!newMode) return;
     
-    logDebug('Mode button clicked', { currentMode: this.state.mode, newMode });
+    logger.debug('Mode button clicked', { currentMode: this.state.mode, newMode });
     
     // If same mode, just open the picker
     if (this.state.mode === newMode && this.fontPickerInstance) {
@@ -265,7 +275,7 @@ export class StylizerElement extends HTMLElement {
    * Handle reset button click
    */
   private handleResetClick() {
-    logDebug('Reset clicked');
+    logger.debug('Reset clicked');
     this.reset();
   }
   
@@ -295,7 +305,7 @@ export class StylizerElement extends HTMLElement {
         // Browse All mode - load all fonts
         const apiKey = this.googleApiKey;
         if (!apiKey) {
-          stylizerLogger.warn('Browse All mode requires API key');
+          logger.warn('Browse All mode requires API key');
           return;
         }
         config.googleFonts = null; // null = all fonts
@@ -313,12 +323,12 @@ export class StylizerElement extends HTMLElement {
       
       this.fontPickerInstance = picker;
       
-      stylizerLogger.info('Picker initialized', {
+      logger.info('Picker initialized', {
         mode: this.state.mode,
         fontCount: this.state.mode === 'curated' ? this.curatedFonts.length : 'all'
       });
     } catch (error) {
-      logError('Failed to initialize FontPicker', error);
+      logger.error('Failed to initialize FontPicker', error);
     }
   }
   
@@ -346,7 +356,7 @@ export class StylizerElement extends HTMLElement {
     // Re-render to show updated font name
     this.render();
     
-    stylizerLogger.info('Font applied', {
+    logger.info('Font applied', {
       fontType: this.state.fontType,
       fontFamily,
       cssVariable
@@ -403,7 +413,7 @@ export class StylizerElement extends HTMLElement {
     
     this.render();
     
-    stylizerLogger.info('Fonts reset', {
+    logger.info('Fonts reset', {
       primaryFont: this.defaultPrimaryFont,
       secondaryFont: this.defaultSecondaryFont
     });

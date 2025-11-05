@@ -89,7 +89,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     }
     await new Promise(resolve => setTimeout(resolve, 100));
   }
-  console.warn('⚠️ JSG Logger not available after initialization. Make sure logger-utils.ts is loaded.');
+  console.warn('⚠️ JSG Logger not available after initialization. Make sure Stylizer component is loaded.');
 })();
 
 
