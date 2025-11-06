@@ -141,6 +141,18 @@ export class StylizerElement extends HTMLElement {
       case 'is-development':
         this.style.display = this.isDevelopment ? 'inline-block' : 'none';
         break;
+      case 'google-api-key':
+        // API key changed - re-render to update Browse All button state
+        // Also destroy picker if it exists and we're in Browse All mode
+        if (this.fontPickerInstance && this.state.mode === 'all') {
+          this.fontPickerInstance.destroy();
+          this.fontPickerInstance = null;
+          // Reinitialize if we have an API key now
+          if (this.googleApiKey) {
+            this.initializeFontPicker();
+          }
+        }
+        break;
     }
     
     this.render();
@@ -194,7 +206,7 @@ export class StylizerElement extends HTMLElement {
     }
     
     // Generate template
-    const template = createTemplate(this.state, buttonConfigToUse);
+    const template = createTemplate(this.state, buttonConfigToUse, !!this.googleApiKey);
     
     // Update shadow DOM
     this.shadowRoot.innerHTML = '';
@@ -294,7 +306,19 @@ export class StylizerElement extends HTMLElement {
     
     if (!newMode) return;
     
+    // Skip if button is disabled
+    if (target.hasAttribute('disabled')) {
+      return;
+    }
+    
     webComponentsLogger.debug('Mode button clicked', { currentMode: this.state.mode, newMode });
+    
+    // Check if Browse All mode requires API key
+    if (newMode === 'all' && !this.googleApiKey) {
+      webComponentsLogger.warn('Browse All mode requires Google API key');
+      alert('Browse All mode requires a Google Fonts API key. Please set the "google-api-key" attribute on the component.');
+      return;
+    }
     
     // If same mode, just open the picker
     if (this.state.mode === newMode && this.fontPickerInstance) {
@@ -314,7 +338,7 @@ export class StylizerElement extends HTMLElement {
     // Initialize picker with new mode
     await this.initializeFontPicker();
     
-    // Open the picker
+    // Open the picker only if it was successfully initialized
     setTimeout(() => {
       if (this.fontPickerInstance) {
         this.fontPickerInstance.open();

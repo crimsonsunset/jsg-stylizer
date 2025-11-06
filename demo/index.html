@@ -242,6 +242,45 @@ import '@jsg/stylizer';
 
   <script type="module">
     import '../src/index.ts';
+    
+    // Set API key from environment variable if available
+    // Supports both VITE_ prefix (Vite) and PUBLIC_ prefix (Astro)
+    // For Netlify, set VITE_GOOGLE_FONTS_API_KEY in environment variables
+    async function setApiKeyIfAvailable() {
+      // Wait for custom element to be defined
+      if (!customElements.get('jsg-stylizer')) {
+        await customElements.whenDefined('jsg-stylizer');
+      }
+      
+      // Wait a tick for elements to be in DOM
+      await new Promise(resolve => setTimeout(resolve, 0));
+      
+      const stylizer = document.querySelector('jsg-stylizer');
+      if (stylizer) {
+        // Check for VITE_ prefix first (Vite convention), then PUBLIC_ (Astro convention)
+        const apiKey = import.meta.env.VITE_GOOGLE_FONTS_API_KEY || import.meta.env.PUBLIC_GOOGLE_FONTS_API_KEY;
+        console.log('API Key check:', {
+          'VITE_GOOGLE_FONTS_API_KEY': import.meta.env.VITE_GOOGLE_FONTS_API_KEY,
+          'PUBLIC_GOOGLE_FONTS_API_KEY': import.meta.env.PUBLIC_GOOGLE_FONTS_API_KEY,
+          'found': !!apiKey
+        });
+        if (apiKey) {
+          stylizer.setAttribute('google-api-key', apiKey);
+          console.log('✅ API key set on stylizer component');
+        } else {
+          console.warn('⚠️ No API key found in environment variables');
+        }
+      } else {
+        console.warn('⚠️ jsg-stylizer element not found');
+      }
+    }
+    
+    // Wait for DOM to be ready, then set API key
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setApiKeyIfAvailable);
+    } else {
+      setApiKeyIfAvailable();
+    }
   </script>
   <script src="./scripts/demo.js"></script>
 </body>

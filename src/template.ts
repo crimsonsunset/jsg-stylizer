@@ -43,7 +43,7 @@ function generateButtonHTML(config: ButtonConfig): string {
 /**
  * Generate the component's HTML template
  */
-export function createTemplate(state: ComponentState, buttonConfig: ButtonConfig): string {
+export function createTemplate(state: ComponentState, buttonConfig: ButtonConfig, hasApiKey: boolean = false): string {
   return `
     <div class="stylizer-container">
       <!-- Toggle Button -->
@@ -82,7 +82,9 @@ export function createTemplate(state: ComponentState, buttonConfig: ButtonConfig
             <button class="mode-btn ${state.mode === 'curated' ? 'active' : ''}" data-mode="curated">
               Curated
             </button>
-            <button class="mode-btn ${state.mode === 'all' ? 'active' : ''}" data-mode="all">
+            <button class="mode-btn ${state.mode === 'all' ? 'active' : ''}" 
+                    data-mode="all" 
+                    ${!hasApiKey ? 'disabled title="Browse All requires a Google Fonts API key"' : ''}>
               Browse All
             </button>
           </div>
