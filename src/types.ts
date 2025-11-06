@@ -72,7 +72,4 @@ export interface StylizerElement extends HTMLElement {
   reset(): void;
 }
 
-// Note: JSX.IntrinsicElements for 'jsg-stylizer' is declared in src/env.d.ts
-// HTMLElementTagNameMap is also declared there to avoid conflicts
-
 

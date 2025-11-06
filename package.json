@@ -20,6 +20,7 @@
   ],
   "scripts": {
     "build": "vite build && tsc --emitDeclarationOnly",
+    "build:demo": "BUILD_DEMO=true vite build",
     "dev": "vite build --watch",
     "type-check": "tsc --noEmit",
     "demo": "vite demo --open"
