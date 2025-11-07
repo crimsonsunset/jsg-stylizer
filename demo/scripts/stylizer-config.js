@@ -18,10 +18,16 @@ async function configureStylizer() {
     'found': !!apiKey
   });
   
-  // Configure Stylizer with API key if available
+  // Configure Stylizer with API key and CSS variables
   // Note: Stylizer.configure() is already called in index.ts with defaults
   // This call will merge the API key into the existing config
-  const config = {};
+  const config = {
+    cssVariables: {
+      primary: '--font-primary',
+      secondary: '--font-secondary'
+    }
+  };
+  
   if (apiKey) {
     config.googleApiKey = apiKey;
     console.log('✅ API key configured in Stylizer');
@@ -30,7 +36,7 @@ async function configureStylizer() {
   }
   
   // Re-configure Stylizer with API key (merges with existing config)
-  Stylizer.configure(config);
+  await Stylizer.configure(config);
 }
 
 // Wait for DOM to be ready, then configure
