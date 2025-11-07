@@ -64,6 +64,29 @@ function Sidebar({ config, initialFonts }: SidebarProps) {
     }
   }, [isCollapsed]);
 
+  // Manage body class for content push animation
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    if (!isCollapsed) {
+      document.body.classList.add('stylizer-sidebar-open');
+      document.body.classList.remove('stylizer-sidebar-closing');
+    } else {
+      document.body.classList.remove('stylizer-sidebar-open');
+      document.body.classList.add('stylizer-sidebar-closing');
+      // Remove closing class after animation completes
+      setTimeout(() => {
+        document.body.classList.remove('stylizer-sidebar-closing');
+      }, 300);
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.classList.remove('stylizer-sidebar-open');
+      document.body.classList.remove('stylizer-sidebar-closing');
+    };
+  }, [isCollapsed]);
+
   const handleClose = () => {
     setIsCollapsed(true);
   };

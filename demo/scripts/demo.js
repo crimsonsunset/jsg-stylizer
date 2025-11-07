@@ -2,43 +2,14 @@
  * Demo site interactivity
  */
 
-// Theme toggle
+// Theme toggle (keeping for potential future use, but gradient background is always dark)
 const themeToggle = document.getElementById('themeToggle');
-const html = document.documentElement;
-
-themeToggle.addEventListener('click', () => {
-  const currentTheme = html.getAttribute('data-theme');
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', newTheme);
-  localStorage.setItem('theme', newTheme);
-});
-
-// Load saved theme
-const savedTheme = localStorage.getItem('theme') || 'dark';
-html.setAttribute('data-theme', savedTheme);
-
-// Framework tabs
-const tabs = document.querySelectorAll('.tab');
-const tabPanes = document.querySelectorAll('.tab-pane');
-
-tabs.forEach(tab => {
-  tab.addEventListener('click', () => {
-    const targetId = tab.dataset.tab;
-
-    // Update active tab
-    tabs.forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-
-    // Update active pane
-    tabPanes.forEach(pane => {
-      if (pane.id === targetId) {
-        pane.classList.add('active');
-      } else {
-        pane.classList.remove('active');
-      }
-    });
+if (themeToggle) {
+  themeToggle.addEventListener('click', () => {
+    // Theme toggle disabled - using gradient background
+    console.log('Theme toggle disabled - using gradient background');
   });
-});
+}
 
 // Listen to Stylizer font changes
 const stylizer = document.querySelector('jsg-stylizer');

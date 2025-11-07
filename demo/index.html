@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,7 +37,7 @@
     <div class="container">
       <div class="hero-content">
         <h2 class="hero-title">Universal Font Picker Web Component</h2>
-        <p class="hero-subtitle">Framework-agnostic font experimentation tool for Google Fonts. Works in vanilla JS, React, Vue, Svelte, Astro, and anywhere else.</p>
+        <p class="hero-subtitle">Framework-agnostic font experimentation tool. Preact bundled, zero framework dependencies - works everywhere.</p>
         <div class="hero-actions">
           <a href="#installation" class="btn btn-primary">Get Started</a>
           <a href="https://www.npmjs.com/package/@jsg/stylizer" class="btn btn-secondary">npm →</a>
@@ -67,7 +67,7 @@
         <div class="feature-card">
           <div class="feature-icon">🌐</div>
           <h3>Framework Agnostic</h3>
-          <p>Works everywhere - React, Vue, Svelte, Astro, or vanilla JS</p>
+          <p>Preact bundled, zero dependencies - works everywhere</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">🎯</div>
@@ -98,29 +98,37 @@
     </div>
   </section>
 
-  <!-- Framework Examples -->
-  <section class="section section-dark" id="examples">
+  <!-- Code Example -->
+  <section class="section" id="examples">
     <div class="container">
-      <h2 class="section-title">Works in Every Framework</h2>
-      <div class="tabs">
-        <button class="tab active" data-tab="vanilla">Vanilla JS</button>
-        <button class="tab" data-tab="react">React</button>
-        <button class="tab" data-tab="svelte">Svelte</button>
-        <button class="tab" data-tab="vue">Vue</button>
-        <button class="tab" data-tab="astro">Astro</button>
-      </div>
-      
-      <div class="tab-content">
-        <!-- Vanilla JS -->
-        <div class="tab-pane active" id="vanilla">
-          <pre><code>&lt;!DOCTYPE html&gt;
+      <h2 class="section-title">Quick Start</h2>
+      <div class="code-example">
+        <p class="code-example-note">Works the same way in React, Vue, Svelte, Astro - Preact is bundled, zero dependencies needed.</p>
+        <pre><code>&lt;!DOCTYPE html&gt;
 &lt;html&gt;
+&lt;head&gt;
+  &lt;style&gt;
+    :root {
+      --font-primary: "Roboto", sans-serif;
+      --font-secondary: "Open Sans", sans-serif;
+    }
+    
+    body {
+      font-family: var(--font-primary);
+    }
+    
+    h1, h2, h3 {
+      font-family: var(--font-secondary);
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
 &lt;body&gt;
   &lt;h1&gt;Hello Stylizer!&lt;/h1&gt;
   
   &lt;jsg-stylizer 
     is-development="true"
-    default-primary-font="Roboto"&gt;
+    default-primary-font="Roboto"
+    default-secondary-font="Open Sans"&gt;
   &lt;/jsg-stylizer&gt;
   
   &lt;script type="module"&gt;
@@ -133,84 +141,6 @@
   &lt;/script&gt;
 &lt;/body&gt;
 &lt;/html&gt;</code></pre>
-        </div>
-        
-        <!-- React -->
-        <div class="tab-pane" id="react">
-          <pre><code>import '@jsg/stylizer';
-
-function App() {
-  const handleFontChange = (e) =&gt; {
-    console.log('Font changed:', e.detail);
-  };
-  
-  return (
-    &lt;div&gt;
-      &lt;h1&gt;My React App&lt;/h1&gt;
-      &lt;jsg-stylizer
-        is-development={import.meta.env.DEV}
-        default-primary-font="Roboto"
-        onFont-changed={handleFontChange}
-      /&gt;
-    &lt;/div&gt;
-  );
-}</code></pre>
-        </div>
-        
-        <!-- Svelte -->
-        <div class="tab-pane" id="svelte">
-          <pre><code>&lt;script lang="ts"&gt;
-  import '@jsg/stylizer';
-  
-  function handleFontChange(e) {
-    console.log('Font changed:', e.detail);
-  }
-&lt;/script&gt;
-
-&lt;h1&gt;My Svelte App&lt;/h1&gt;
-
-&lt;jsg-stylizer
-  is-development="true"
-  default-primary-font="Roboto"
-  on:font-changed={handleFontChange}
-/&gt;</code></pre>
-        </div>
-        
-        <!-- Vue -->
-        <div class="tab-pane" id="vue">
-          <pre><code>&lt;script setup lang="ts"&gt;
-import '@jsg/stylizer';
-
-const handleFontChange = (e) =&gt; {
-  console.log('Font changed:', e.detail);
-};
-&lt;/script&gt;
-
-&lt;template&gt;
-  &lt;div&gt;
-    &lt;h1&gt;My Vue App&lt;/h1&gt;
-    &lt;jsg-stylizer
-      is-development="true"
-      default-primary-font="Roboto"
-      @font-changed="handleFontChange"
-    /&gt;
-  &lt;/div&gt;
-&lt;/template&gt;</code></pre>
-        </div>
-        
-        <!-- Astro -->
-        <div class="tab-pane" id="astro">
-          <pre><code>---
-import '@jsg/stylizer';
----
-
-&lt;h1&gt;My Astro Site&lt;/h1&gt;
-
-&lt;jsg-stylizer
-  is-development={import.meta.env.DEV}
-  default-primary-font="Roboto"
-/&gt;</code></pre>
-        </div>
       </div>
     </div>
   </section>

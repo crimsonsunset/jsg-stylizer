@@ -54,3 +54,14 @@
   z-index: 10000 !important;
 }
 
+/* Body content push animation when sidebar is open */
+body.stylizer-sidebar-open {
+  margin-right: 400px !important;
+  transition: margin-right 0.3s ease-out !important;
+}
+
+body.stylizer-sidebar-closing {
+  margin-right: 0 !important;
+  transition: margin-right 0.3s ease-in !important;
+}
+

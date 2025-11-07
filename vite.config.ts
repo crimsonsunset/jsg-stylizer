@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv } from 'vite';
 import { resolve } from 'path';
 import preact from '@preact/preset-vite';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig(({ mode }) => {
   // Check if we're building or serving the demo
@@ -41,7 +42,16 @@ export default defineConfig(({ mode }) => {
 
   // Library build configuration (default)
   return {
-    plugins: [preact()],
+    plugins: [
+      preact(),
+      visualizer({
+        filename: 'dist/stats.html',
+        open: false,
+        gzipSize: true,
+        brotliSize: true,
+        template: 'treemap'
+      })
+    ],
     build: {
       lib: {
         entry: resolve(__dirname, 'src/index.ts'),
