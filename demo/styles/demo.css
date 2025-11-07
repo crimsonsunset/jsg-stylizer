@@ -231,6 +231,15 @@ button.success:hover, .btn-success:hover {
 .header-actions {
   display: flex;
   gap: 0.5rem;
+  position: relative;
+}
+
+/* When sidebar is collapsed, position GitHub button to left of collapsed button */
+body:not(.stylizer-sidebar-open):not(.stylizer-sidebar-closing) .header-actions {
+  position: fixed;
+  top: 20px;
+  right: 60px; /* Position to left of collapsed button (which is at right: 20px) */
+  z-index: 9997;
 }
 
 .btn-icon {
