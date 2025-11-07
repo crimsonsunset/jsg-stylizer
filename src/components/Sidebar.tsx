@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'preact/hooks';
 import { render } from 'preact';
-import { ThemeProvider, Pane } from 'evergreen-ui';
+import { ThemeProvider, Pane, useTheme } from 'evergreen-ui';
 import { SidebarHeader } from './SidebarHeader';
 import { CollapsedButton } from './CollapsedButton';
 import { FontSection } from './FontSection';
@@ -81,51 +81,97 @@ function Sidebar({ config, initialFonts }: SidebarProps) {
 
   if (isCollapsed) {
     return (
-      <ThemeProvider value={darkTheme}>
-        <CollapsedButton onClick={handleOpen} />
+      <ThemeProvider value={darkTheme as any}>
+        {<CollapsedButton onClick={handleOpen} /> as any}
       </ThemeProvider>
     );
   }
 
   return (
-    <ThemeProvider value={darkTheme}>
-      <Pane
-        position="fixed"
-        top={0}
-        right={0}
-        width={400}
-        height="100vh"
-        background="tint1"
-        elevation={3}
-        display="flex"
-        flexDirection="column"
-        className="stylizer-sidebar stylizer-sidebar-container"
-      >
-        <SidebarHeader onClose={handleClose} />
-        
-        <Pane flex={1} overflowY="auto">
-          <FontSection
-            fontType="primary"
-            fontFamily={fonts.primary}
-            mode={primaryMode}
-            onSelectFont={handleSelectFont}
-            onModeChange={setPrimaryMode}
-            hasApiKey={hasApiKey}
-          />
-          
-          <FontSection
-            fontType="secondary"
-            fontFamily={fonts.secondary}
-            mode={secondaryMode}
-            onSelectFont={handleSelectFont}
-            onModeChange={setSecondaryMode}
-            hasApiKey={hasApiKey}
-          />
-          
-          <ThemePreview config={config} />
-        </Pane>
-      </Pane>
+    <ThemeProvider value={darkTheme as any}>
+      {<SidebarContent
+        config={config}
+        fonts={fonts}
+        primaryMode={primaryMode}
+        secondaryMode={secondaryMode}
+        onClose={handleClose}
+        onSelectFont={handleSelectFont}
+        onPrimaryModeChange={setPrimaryMode}
+        onSecondaryModeChange={setSecondaryMode}
+        hasApiKey={hasApiKey}
+      /> as any}
     </ThemeProvider>
+  );
+}
+
+interface SidebarContentProps {
+  config: InternalConfig;
+  fonts: { primary: string; secondary: string };
+  primaryMode: FontMode;
+  secondaryMode: FontMode;
+  onClose: () => void;
+  onSelectFont: (fontType: FontType, mode: FontMode) => void;
+  onPrimaryModeChange: (mode: FontMode) => void;
+  onSecondaryModeChange: (mode: FontMode) => void;
+  hasApiKey: boolean;
+}
+
+/**
+ * Sidebar content component that uses theme hook
+ */
+function SidebarContent({
+  config,
+  fonts,
+  primaryMode,
+  secondaryMode,
+  onClose,
+  onSelectFont,
+  onPrimaryModeChange,
+  onSecondaryModeChange,
+  hasApiKey
+}: SidebarContentProps) {
+  const theme = useTheme();
+  const backgroundColor = (theme.colors as any)?.background?.tint1 || '#1E1E1E';
+  const textColor = (theme.colors as any)?.text?.default || '#FFFFFF';
+
+  return (
+    <Pane
+      position="fixed"
+      top={0}
+      right={0}
+      width={400}
+      height="100vh"
+      backgroundColor={backgroundColor}
+      color={textColor}
+      elevation={3}
+      display="flex"
+      flexDirection="column"
+      className="stylizer-sidebar stylizer-sidebar-container"
+    >
+      <SidebarHeader onClose={onClose} />
+      
+      <Pane flex={1} overflowY="auto">
+        <FontSection
+          fontType="primary"
+          fontFamily={fonts.primary}
+          mode={primaryMode}
+          onSelectFont={onSelectFont}
+          onModeChange={onPrimaryModeChange}
+          hasApiKey={hasApiKey}
+        />
+        
+        <FontSection
+          fontType="secondary"
+          fontFamily={fonts.secondary}
+          mode={secondaryMode}
+          onSelectFont={onSelectFont}
+          onModeChange={onSecondaryModeChange}
+          hasApiKey={hasApiKey}
+        />
+        
+        <ThemePreview config={config} />
+      </Pane>
+    </Pane>
   );
 }
 
@@ -145,4 +191,3 @@ export function mountSidebar(config: InternalConfig, initialFonts: { primary: st
     container.remove();
   };
 }
-
