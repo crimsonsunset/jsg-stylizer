@@ -1,6 +1,6 @@
 /**
  * FontDetails - Display font information in standardized format
- * Format: FontFamily | Weight | Numeric
+ * Format: Weight | Numeric (font name excluded)
  */
 
 import { Text } from 'evergreen-ui';
@@ -12,11 +12,11 @@ interface FontDetailsProps {
 }
 
 /**
- * Font details component displaying font info in FontFamily | Weight | Numeric format
- * Example: "Roboto | normal | 400" or "Roboto | italic | 700"
+ * Font details component displaying font info in Weight | Numeric format
+ * Example: "400" or "italic | 700"
  */
 export function FontDetails({ fontFamily, weight, numeric }: FontDetailsProps) {
-  const parts: string[] = [fontFamily];
+  const parts: string[] = [];
   
   // Add numeric weight if available
   if (numeric !== undefined) {

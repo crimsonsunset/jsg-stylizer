@@ -2,15 +2,6 @@
  * Demo site interactivity
  */
 
-// Theme toggle (keeping for potential future use, but gradient background is always dark)
-const themeToggle = document.getElementById('themeToggle');
-if (themeToggle) {
-  themeToggle.addEventListener('click', () => {
-    // Theme toggle disabled - using gradient background
-    console.log('Theme toggle disabled - using gradient background');
-  });
-}
-
 // Listen to Stylizer font changes
 const stylizer = document.querySelector('jsg-stylizer');
 if (stylizer) {
@@ -24,18 +15,19 @@ if (stylizer) {
     console.log('Font changed:', e.detail);
     
     // Update demo text to show the change
-    const { fontType, fontFamily } = e.detail;
+    const { fontType, fontFamily, weight, italic } = e.detail;
+    const italicText = italic ? ' italic' : '';
     if (fontType === 'primary') {
-      document.getElementById('demo-primary').textContent = `this is your primary font`;
+      document.getElementById('demo-primary').textContent = `Primary Font: ${fontFamily} | ${weight}${italicText}`;
     } else {
-      document.getElementById('demo-secondary').textContent = `this is your secondary font`;
+      document.getElementById('demo-secondary').textContent = `Secondary Font: ${fontFamily} | ${weight}${italicText}`;
     }
   });
   
   stylizer.addEventListener('font-reset', (e) => {
     console.log('Fonts reset:', e.detail);
-    document.getElementById('demo-primary').textContent = 'this is your primary font';
-    document.getElementById('demo-secondary').textContent = 'this is your secondary font';
+    document.getElementById('demo-primary').textContent = 'Primary Font: Changa One | 400';
+    document.getElementById('demo-secondary').textContent = 'Secondary Font: Nova Square | 400';
   });
 }
 

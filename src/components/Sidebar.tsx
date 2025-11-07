@@ -163,7 +163,7 @@ function SidebarContent({
     >
       <SidebarHeader onClose={onClose} />
       
-      <Pane flex={1} overflowY="auto">
+      <Pane flex={1} overflowY="auto" display="flex" flexDirection="column">
         <FontSection
           fontType="primary"
           fontFamily={fonts.primary.family}
@@ -183,9 +183,9 @@ function SidebarContent({
           onSelectFont={onSelectFont}
           hasApiKey={hasApiKey}
         />
-        
-        <ThemePreview config={config} fonts={fonts} />
       </Pane>
+      
+      <ThemePreview config={config} fonts={fonts} />
     </Pane>
   );
 }

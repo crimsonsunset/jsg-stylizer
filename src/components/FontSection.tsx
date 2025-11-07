@@ -3,7 +3,6 @@
  */
 
 import { Pane, Button, Heading } from 'evergreen-ui';
-import { FontDetails } from './FontDetails';
 import type { FontType, FontMode } from '../types';
 
 interface FontSectionProps {
@@ -33,42 +32,33 @@ export function FontSection({
 
   return (
     <Pane paddingX={16} paddingY={12} borderBottom="muted">
-      <Heading size={400} marginBottom={8} color="#FFFFFF">
+      <Heading size={400} marginBottom={12} color="#FFFFFF">
         {label}
       </Heading>
 
-      {/* Display current font info */}
-      <Pane marginBottom={12}>
-        <FontDetails 
-          fontFamily={fontFamily} 
-          weight={weight} 
-          numeric={numeric} 
-        />
-      </Pane>
-
-      <Pane display="flex" flexDirection="column" gap={8}>
+      <Pane display="flex" flexDirection="row" gap={8}>
         <Button
           appearance="primary"
           onClick={() => onSelectFont(fontType, 'curated')}
-          width="100%"
+          flex={1}
         >
-          browse curated font list
+          Browse Curated Font List
         </Button>
         <Button
           appearance="primary"
           onClick={() => onSelectFont(fontType, 'all')}
-          width="100%"
+          flex={1}
           disabled={!hasApiKey}
           title={!hasApiKey ? 'Browse All mode requires Google Fonts API key' : ''}
         >
-          browse all google fonts
+          Browse All Google Fonts
         </Button>
-        {!hasApiKey && (
-          <Pane fontSize={11} color="muted" marginTop={-4}>
-            API key required for Browse All mode
-          </Pane>
-        )}
       </Pane>
+      {!hasApiKey && (
+        <Pane fontSize={11} color="muted" marginTop={8}>
+          API key required for Browse All mode
+        </Pane>
+      )}
     </Pane>
   );
 }
