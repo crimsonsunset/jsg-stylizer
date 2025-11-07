@@ -11,7 +11,7 @@ import { CollapsedButton } from './CollapsedButton';
 import { FontSection } from './FontSection';
 import { ThemePreview } from './ThemePreview';
 import { Stylizer } from '../Stylizer';
-import type { FontType, FontMode } from '../types';
+import type { FontType, FontMode, FontInfo } from '../types';
 import type { InternalConfig } from '../config';
 import { darkTheme } from './theme';
 import './styles.css';
@@ -19,8 +19,8 @@ import './styles.css';
 interface SidebarProps {
   config: InternalConfig;
   initialFonts: {
-    primary: string;
-    secondary: string;
+    primary: FontInfo;
+    secondary: FontInfo;
   };
 }
 
@@ -44,7 +44,11 @@ function Sidebar({ config, initialFonts }: SidebarProps) {
       const detail = event.detail;
       setFonts(prev => ({
         ...prev,
-        [detail.fontType]: detail.fontFamily
+        [detail.fontType]: {
+          family: detail.fontFamily,
+          weight: detail.weight,
+          italic: detail.italic,
+        }
       }));
     };
 
@@ -123,7 +127,7 @@ function Sidebar({ config, initialFonts }: SidebarProps) {
 
 interface SidebarContentProps {
   config: InternalConfig;
-  fonts: { primary: string; secondary: string };
+  fonts: { primary: FontInfo; secondary: FontInfo };
   onClose: () => void;
   onSelectFont: (fontType: FontType, mode: FontMode) => void;
   hasApiKey: boolean;
@@ -162,6 +166,9 @@ function SidebarContent({
       <Pane flex={1} overflowY="auto">
         <FontSection
           fontType="primary"
+          fontFamily={fonts.primary.family}
+          weight={fonts.primary.italic ? 'italic' : 'normal'}
+          numeric={fonts.primary.weight}
           mode="curated"
           onSelectFont={onSelectFont}
           hasApiKey={hasApiKey}
@@ -169,12 +176,15 @@ function SidebarContent({
         
         <FontSection
           fontType="secondary"
+          fontFamily={fonts.secondary.family}
+          weight={fonts.secondary.italic ? 'italic' : 'normal'}
+          numeric={fonts.secondary.weight}
           mode="curated"
           onSelectFont={onSelectFont}
           hasApiKey={hasApiKey}
         />
         
-        <ThemePreview config={config} />
+        <ThemePreview config={config} fonts={fonts} />
       </Pane>
     </Pane>
   );
@@ -183,7 +193,7 @@ function SidebarContent({
 /**
  * Mount sidebar to DOM
  */
-export function mountSidebar(config: InternalConfig, initialFonts: { primary: string; secondary: string }): () => void {
+export function mountSidebar(config: InternalConfig, initialFonts: { primary: FontInfo; secondary: FontInfo }): () => void {
   const container = document.createElement('div');
   container.id = 'stylizer-sidebar-root';
   document.body.appendChild(container);

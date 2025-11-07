@@ -1,69 +1,85 @@
 /**
- * ThemePreview - Display current font selections
- * Shows font name and weight in format: "Primary: NAME | WEIGHT"
+ * ThemePreview - Display current font selections with live preview
+ * Shows actual fonts in use with preview text
  */
 
 import { Pane, Text, Heading } from 'evergreen-ui';
 import type { InternalConfig } from '../config';
+import type { FontInfo } from '../types';
 
 interface ThemePreviewProps {
   config: InternalConfig;
-}
-
-/**
- * Extract font name from CSS variable value
- * Handles formats like: "FontName", sans-serif or "FontName"
- */
-function extractFontName(cssValue: string): string {
-  if (!cssValue || cssValue === 'Not set') return 'Not set';
-  
-  // Remove quotes and extract font name (before first comma)
-  const match = cssValue.match(/^"?([^",]+)"?/);
-  return match ? match[1].trim() : cssValue;
-}
-
-/**
- * Extract font weight from CSS variable (defaults to 400 if not found)
- * For now, we default to 400 as weight isn't stored separately
- */
-function extractFontWeight(cssValue: string): string {
-  // Weight isn't currently stored in CSS variable, default to 400
-  // TODO: Store weight when font picker supports it
-  return '400';
-}
-
-/**
- * Theme preview component displaying font selections
- */
-export function ThemePreview({ config }: ThemePreviewProps) {
-  const getCSSVariableValue = (variableName: string): string => {
-    if (typeof document === 'undefined') return 'Not set';
-    const value = getComputedStyle(document.documentElement)
-      .getPropertyValue(variableName)
-      .trim();
-    return value || 'Not set';
+  fonts: {
+    primary: FontInfo;
+    secondary: FontInfo;
   };
+}
 
-  const primaryValue = getCSSVariableValue(config.cssVariables.primary);
-  const secondaryValue = getCSSVariableValue(config.cssVariables.secondary);
-  
-  const primaryFont = extractFontName(primaryValue);
-  const secondaryFont = extractFontName(secondaryValue);
-  const primaryWeight = extractFontWeight(primaryValue);
-  const secondaryWeight = extractFontWeight(secondaryValue);
+/**
+ * Theme preview component displaying font selections with live preview
+ */
+export function ThemePreview({ config, fonts }: ThemePreviewProps) {
+  const previewText = config.previewText || 'The quick brown fox jumps over the lazy dog';
+
+  // Build CSS font-family strings
+  const primaryFontFamily = `"${fonts.primary.family}", sans-serif`;
+  const secondaryFontFamily = `"${fonts.secondary.family}", sans-serif`;
 
   return (
-    <Pane paddingX={16} paddingY={12} borderTop="muted">
-      <Heading size={400} marginBottom={8} color="#FFFFFF">
+    <Pane paddingX={16} paddingY={24} borderTop="muted">
+      <Heading size={500} marginBottom={16} color="#FFFFFF">
         Theme Preview
       </Heading>
-      <Pane display="flex" flexDirection="column" gap={6}>
-        <Text size={300} color="muted">
-          Primary: {primaryFont} | {primaryWeight}
-        </Text>
-        <Text size={300} color="muted">
-          Secondary: {secondaryFont} | {secondaryWeight}
-        </Text>
+      <Pane display="flex" flexDirection="column" gap={16}>
+        {/* Primary Font Preview */}
+        <Pane display="flex" flexDirection="column" gap={8}>
+          <Text size={400} color="muted" fontWeight={500}>
+            Primary: {fonts.primary.family} | {fonts.primary.weight}{fonts.primary.italic ? ' italic' : ''}
+          </Text>
+          <Pane
+            padding={12}
+            backgroundColor="rgba(255, 255, 255, 0.05)"
+            borderRadius={4}
+            style={{
+              fontFamily: primaryFontFamily,
+              fontWeight: fonts.primary.weight,
+              fontStyle: fonts.primary.italic ? 'italic' : 'normal',
+              fontSize: '13px',
+              lineHeight: '1.4',
+              color: '#FFFFFF',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}
+          >
+            {previewText}
+          </Pane>
+        </Pane>
+
+        {/* Secondary Font Preview */}
+        <Pane display="flex" flexDirection="column" gap={8}>
+          <Text size={400} color="muted" fontWeight={500}>
+            Secondary: {fonts.secondary.family} | {fonts.secondary.weight}{fonts.secondary.italic ? ' italic' : ''}
+          </Text>
+          <Pane
+            padding={12}
+            backgroundColor="rgba(255, 255, 255, 0.05)"
+            borderRadius={4}
+            style={{
+              fontFamily: secondaryFontFamily,
+              fontWeight: fonts.secondary.weight,
+              fontStyle: fonts.secondary.italic ? 'italic' : 'normal',
+              fontSize: '13px',
+              lineHeight: '1.4',
+              color: '#FFFFFF',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}
+          >
+            {previewText}
+          </Pane>
+        </Pane>
       </Pane>
     </Pane>
   );

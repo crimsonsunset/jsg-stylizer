@@ -3,6 +3,7 @@
  */
 
 import { Pane, Button, Heading } from 'evergreen-ui';
+import { FontDetails } from './FontDetails';
 import type { FontType, FontMode } from '../types';
 
 interface FontSectionProps {
@@ -12,7 +13,7 @@ interface FontSectionProps {
   numeric?: number;
   mode: FontMode;
   onSelectFont: (fontType: FontType, mode: FontMode) => void;
-  onModeChange: (mode: FontMode) => void;
+  onModeChange?: (mode: FontMode) => void;
   hasApiKey: boolean;
 }
 
@@ -26,17 +27,24 @@ export function FontSection({
   numeric,
   mode,
   onSelectFont,
-  onModeChange,
   hasApiKey
 }: FontSectionProps) {
   const label = fontType === 'primary' ? 'Primary Font' : 'Secondary Font';
-  const buttonText = fontType === 'primary' ? 'Select Primary Font' : 'Select Secondary Font';
 
   return (
     <Pane paddingX={16} paddingY={12} borderBottom="muted">
       <Heading size={400} marginBottom={8} color="#FFFFFF">
         {label}
       </Heading>
+
+      {/* Display current font info */}
+      <Pane marginBottom={12}>
+        <FontDetails 
+          fontFamily={fontFamily} 
+          weight={weight} 
+          numeric={numeric} 
+        />
+      </Pane>
 
       <Pane display="flex" flexDirection="column" gap={8}>
         <Button

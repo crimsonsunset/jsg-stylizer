@@ -19,7 +19,10 @@ import { Stylizer } from './Stylizer';
 
 // Auto-initialize with defaults if in browser environment
 if (typeof window !== 'undefined') {
-  Stylizer.configure();
+  // Don't await - let it initialize in background
+  Stylizer.configure().catch(error => {
+    console.error('Failed to initialize Stylizer:', error);
+  });
 }
 
 // Export Stylizer class
