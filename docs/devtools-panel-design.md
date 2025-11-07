@@ -36,7 +36,6 @@ The goal is to replace the existing dropdown-based font selection UI with a mode
 - **Sidebar**: Main container with collapse/expand logic and state management
 - **SidebarHeader**: Sticky header with title and close (X) button
 - **FontSection**: Primary/secondary font sections with side-by-side buttons
-- **FontDetails**: Component displaying font weight only (font name removed)
 - **ThemePreview**: Component showing current font selections (sticky to bottom)
 
 ### Integration Points

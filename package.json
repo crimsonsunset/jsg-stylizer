@@ -1,7 +1,7 @@
 {
   "name": "@jsg/stylizer",
   "version": "1.0.0",
-  "description": "Universal font picker Web Component for experimenting with Google Fonts",
+  "description": "Config-driven font picker with DevTools sidebar for experimenting with Google Fonts",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.esm.js",
@@ -24,7 +24,6 @@
     "dev": "vite build --watch",
     "type-check": "tsc --noEmit",
     "demo": "DEMO_MODE=true vite --open",
-    "test": "vite --open test-phase1.html",
     "analyze": "npm run build && open dist/stats.html"
   },
   "dependencies": {
@@ -44,12 +43,14 @@
     "vite": "^5.0.0"
   },
   "keywords": [
-    "web-component",
-    "custom-element",
     "font-picker",
     "google-fonts",
     "typography",
     "framework-agnostic",
+    "preact",
+    "devtools",
+    "sidebar",
+    "css-variables",
     "react",
     "vue",
     "svelte",

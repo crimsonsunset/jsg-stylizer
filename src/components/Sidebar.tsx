@@ -59,6 +59,19 @@ function Sidebar({ config, initialFonts }: SidebarProps) {
     };
   }, []);
 
+  // Listen to sidebar toggle events
+  useEffect(() => {
+    const handleToggle = () => {
+      setIsCollapsed(prev => !prev);
+    };
+
+    window.addEventListener('stylizer-sidebar-toggle', handleToggle as EventListener);
+    
+    return () => {
+      window.removeEventListener('stylizer-sidebar-toggle', handleToggle as EventListener);
+    };
+  }, []);
+
   // Persist collapsed state
   useEffect(() => {
     if (typeof window !== 'undefined') {

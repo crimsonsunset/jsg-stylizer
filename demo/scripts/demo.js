@@ -2,6 +2,14 @@
  * Demo site interactivity
  */
 
+// Toggle Stylizer sidebar button
+const toggleBtn = document.getElementById('toggle-stylizer-btn');
+if (toggleBtn) {
+  toggleBtn.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('stylizer-sidebar-toggle'));
+  });
+}
+
 // Listen to Stylizer font changes via window events
 window.addEventListener('stylizer-font-changed', (e) => {
   console.log('Font changed:', e.detail);
