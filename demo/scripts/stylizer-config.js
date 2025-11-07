@@ -19,13 +19,25 @@ async function configureStylizer() {
   });
   
   // Configure Stylizer with API key and CSS variables
-  // Note: Stylizer.configure() is already called in index.ts with defaults
-  // This call will merge the API key into the existing config
+  // Using new separate CSS variables format
   const config = {
+    fonts: {
+      primary: 'Changa One',
+      secondary: 'Nova Square'
+    },
     cssVariables: {
-      primary: '--font-primary',
-      secondary: '--font-secondary'
-    }
+      primary: {
+        family: '--font-primary-family',
+        weight: '--font-primary-weight',
+        style: '--font-primary-style'
+      },
+      secondary: {
+        family: '--font-secondary-family',
+        weight: '--font-secondary-weight',
+        style: '--font-secondary-style'
+      }
+    },
+    previewText: 'Build. Lead. Learn. JSG Tech Check.'
   };
   
   if (apiKey) {
@@ -35,7 +47,7 @@ async function configureStylizer() {
     console.warn('⚠️ No API key found in environment variables');
   }
   
-  // Re-configure Stylizer with API key (merges with existing config)
+  // Configure Stylizer (merges with existing config from auto-initialization)
   await Stylizer.configure(config);
 }
 

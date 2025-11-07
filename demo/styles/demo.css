@@ -335,6 +335,9 @@ body:not(.stylizer-sidebar-open):not(.stylizer-sidebar-closing) .header-actions 
   margin-bottom: 0.5rem;
   color: var(--color-text-default);
   font-family: var(--font-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .demo-subtitle {
@@ -342,6 +345,9 @@ body:not(.stylizer-sidebar-open):not(.stylizer-sidebar-closing) .header-actions 
   margin-bottom: 2rem;
   color: var(--color-primary-light);
   font-family: var(--font-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .demo-stylizer {

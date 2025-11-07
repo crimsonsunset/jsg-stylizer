@@ -19,43 +19,49 @@ The goal is to replace the existing dropdown-based font selection UI with a mode
 - **Theme Preview**: Display current CSS variable values for theme customization
 
 ### Font Display Format
-- **Consistent Formatting**: Match the demo page's font detail format: `FontFamily | Weight | Numeric`
-- **Reactive Updates**: Display should update immediately when fonts are changed via the picker
-- **Preview Text**: Show preview text in the selected font for both primary and secondary fonts
+- **Simplified Display**: Shows font weight only (removed font name for cleaner UI)
+- **Reactive Updates**: Display updates immediately when fonts are changed via the picker
+- **Theme Preview**: Shows actual font format: "Primary Font: Changa One | 400" / "Secondary Font: Nova Square | 400"
+- **Sticky Preview**: Theme preview section sticky to bottom of sidebar for always-visible reference
 
 ## Architecture Approach
 
 ### Technology Stack
-- **Preact**: Lightweight React alternative for the DevTools UI components
-- **Evergreen UI**: Component library for consistent, accessible UI elements
-- **React-Draggable**: For the floating button that triggers the panel
-- **Vite**: Build tool configured with Preact plugin and JSX support
+- **Preact**: Lightweight React alternative for the DevTools UI components ✅ Implemented
+- **Evergreen UI**: Component library for consistent, accessible UI elements ✅ Implemented
+- **Vite**: Build tool configured with Preact plugin and JSX support ✅ Implemented
 
 ### Component Structure
-- **FloatingButton**: Draggable 3x3 grid widget that acts as the entry point
-- **DevToolsPanel**: Main orchestrator managing panel state and font data
-- **PanelContainer**: Slide-in panel with sticky header and scrollable content
-- **FontDetails**: Component displaying font information in the standardized format
-- **ThemePreview**: Component showing current CSS variable values
+- **CollapsedButton**: Small button in top-right corner when sidebar is collapsed (positioned to left of GitHub button)
+- **Sidebar**: Main container with collapse/expand logic and state management
+- **SidebarHeader**: Sticky header with title and close (X) button
+- **FontSection**: Primary/secondary font sections with side-by-side buttons
+- **FontDetails**: Component displaying font weight only (font name removed)
+- **ThemePreview**: Component showing current font selections (sticky to bottom)
 
 ### Integration Points
-- **Event Listeners**: Panel listens to `font-changed` events from the Stylizer component
-- **State Management**: Tracks both primary and secondary font data (family, weight, numeric weight)
-- **Lifecycle**: Panel mounts/unmounts with the Web Component lifecycle
-- **Positioning**: Font picker modal positioned top-left with higher z-index than panel
+- **Event Listeners**: Sidebar listens to `stylizer-font-changed` events from window
+- **State Management**: Tracks both primary and secondary font data (family, weight, italic) using Preact hooks
+- **Lifecycle**: Sidebar mounts/unmounts via `mountSidebar()` method in Stylizer class
+- **Positioning**: Font picker modal positioned top-left with higher z-index than sidebar
+- **Collapsed State**: Persists sidebar collapsed/expanded state to localStorage
 
 ## Key Features
 
 ### Font Selection
 - Separate buttons for selecting primary and secondary fonts
-- Each font type displays its current selection with full details
-- Format matches demo page: `FontFamily | Weight | Numeric`
+- Buttons arranged side-by-side (Title Case: "Browse Curated Font List", "Browse All Google Fonts")
+- Font weight displayed only (font name removed for cleaner UI)
+- Mode buttons support both Curated (38 fonts) and Browse All (1500+ fonts) modes
 
 ### Panel Behavior
 - Slides in from right with smooth animation
 - Sticky header with close button
-- Scrollable content area for font controls and theme preview
-- Floating button can be dragged to different screen positions
+- Scrollable content area for font controls
+- Theme preview sticky to bottom (always visible)
+- Close button collapses to small button in top-right corner
+- Small button reopens full sidebar
+- Collapsed button positioned to left of GitHub button to avoid overlap
 
 ### Font Picker Modal
 - Positioned at top-left corner (20px from edges)
@@ -65,9 +71,10 @@ The goal is to replace the existing dropdown-based font selection UI with a mode
 ## Implementation Notes
 
 ### State Management
-- Font data stored separately for primary and secondary fonts
-- Updates triggered by `font-changed` events from Stylizer component
-- Default values match demo page defaults (Zen Tokyo Zoo, Noto Sans SC)
+- Font data stored separately for primary and secondary fonts (family, weight, italic)
+- Updates triggered by `stylizer-font-changed` window events
+- Default fonts: Changa One (primary), Nova Square (secondary)
+- Sidebar collapsed state persisted to localStorage
 
 ### Styling
 - Dark theme matching the overall design system
@@ -75,9 +82,10 @@ The goal is to replace the existing dropdown-based font selection UI with a mode
 - Responsive layout considerations for panel width
 
 ### Development Mode
-- Panel only available when `is-development` attribute is set
+- Panel available via `Stylizer.configure()` API (config-driven)
 - Integrated into main Stylizer package (not tree-shakeable)
 - DevTools code lives within the `jsg-stylizer` package structure
+- Demo page improvements: header layout (75px height), text formatting, removed theme toggle
 
 ## Future Considerations
 

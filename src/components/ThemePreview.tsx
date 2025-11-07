@@ -33,7 +33,12 @@ export function ThemePreview({ config, fonts }: ThemePreviewProps) {
       <Pane display="flex" flexDirection="column" gap={16}>
         {/* Primary Font Preview */}
         <Pane display="flex" flexDirection="column" gap={8}>
-          <Text size={400} color="muted" fontWeight={500}>
+          <Text 
+            size={400} 
+            color="muted" 
+            fontWeight={500}
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
             Primary: {fonts.primary.family} | {fonts.primary.weight}{fonts.primary.italic ? ' italic' : ''}
           </Text>
           <Pane
@@ -58,7 +63,12 @@ export function ThemePreview({ config, fonts }: ThemePreviewProps) {
 
         {/* Secondary Font Preview */}
         <Pane display="flex" flexDirection="column" gap={8}>
-          <Text size={400} color="muted" fontWeight={500}>
+          <Text 
+            size={400} 
+            color="muted" 
+            fontWeight={500}
+            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          >
             Secondary: {fonts.secondary.family} | {fonts.secondary.weight}{fonts.secondary.italic ? ' italic' : ''}
           </Text>
           <Pane

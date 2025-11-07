@@ -11,6 +11,7 @@ import type { StylizerConfig, InternalConfig } from './config';
 import { mergeConfig, validateConfig, defaultConfig } from './config';
 import JSGLogger from '@crimsonsunset/jsg-logger';
 import { mountSidebar } from './components/Sidebar';
+import 'fontpicker/dist/fontpicker.min.css';
 
 // Initialize logger once at module level
 const loggerInstance = JSGLogger.getInstanceSync({
@@ -63,7 +64,6 @@ export class Stylizer {
   private currentFontType: FontType = 'primary';
   private currentMode: FontMode = 'curated';
   private globalStyleElement: HTMLStyleElement | null = null;
-  private fontPickerCSSLink: HTMLLinkElement | HTMLStyleElement | null = null;
   private sidebarCleanup: (() => void) | null = null;
 
   /**
@@ -72,7 +72,6 @@ export class Stylizer {
   private constructor() {
     webComponentsLogger.debug('Stylizer instance created');
     this.injectGlobalStyles();
-    // CSS will be injected when font picker is initialized
   }
 
   /**
@@ -137,46 +136,6 @@ export class Stylizer {
   }
 
   /**
-   * Inject JSFontPicker CSS from node_modules
-   */
-  private injectFontPickerCSS(): void {
-    if (typeof document === 'undefined') return;
-    
-    // Check if already injected
-    if (document.getElementById('stylizer-fontpicker-css')) {
-      return;
-    }
-    
-    // Create link element to load CSS
-    // In Vite dev mode, we can use the node_modules path
-    // In production build, Vite will handle asset URLs
-    const link = document.createElement('link');
-    link.id = 'stylizer-fontpicker-css';
-    link.rel = 'stylesheet';
-    link.type = 'text/css';
-    
-    // Try to use Vite's asset handling - works in dev mode
-    // For production, this will need to be handled differently
-    // or the CSS should be imported at build time
-    const cssPath = '/node_modules/fontpicker/dist/fontpicker.min.css';
-    link.href = cssPath;
-    
-    // Handle load/error events
-    link.onload = () => {
-      webComponentsLogger.debug('JSFontPicker CSS loaded');
-    };
-    link.onerror = () => {
-      webComponentsLogger.warn('Failed to load JSFontPicker CSS from', cssPath);
-      // Try alternative path or fallback
-    };
-    
-    document.head.appendChild(link);
-    this.fontPickerCSSLink = link;
-    
-    webComponentsLogger.debug('JSFontPicker CSS link injected');
-  }
-
-  /**
    * Inject global styles for JSFontPicker dialog
    */
   private injectGlobalStyles(): void {
@@ -230,9 +189,6 @@ export class Stylizer {
     if (!this.buttonRef) return;
     
     try {
-      // Ensure CSS is injected first
-      this.injectFontPickerCSS();
-      
       // Ensure global styles are injected
       this.injectGlobalStyles();
       
@@ -241,9 +197,6 @@ export class Stylizer {
         this.fontPickerInstance.destroy();
         this.fontPickerInstance = null;
       }
-      
-      // Wait a bit for CSS to load before initializing picker
-      await new Promise(resolve => setTimeout(resolve, 200));
       
       // Dynamically import JSFontPicker
       const FontPickerModule = await import('fontpicker/dist/fontpicker.js');
@@ -271,10 +224,10 @@ export class Stylizer {
       // Create picker instance
       const picker = new FontPicker(this.buttonRef as any, config);
       
-      // Re-inject styles after picker creates its DOM
-      setTimeout(() => {
-        this.injectGlobalStyles();
-      }, 100);
+      // Verify picker was created successfully
+      if (!picker) {
+        throw new Error('Failed to create JSFontPicker instance');
+      }
       
       // Listen for font selection
       (picker as any).on('pick', (font: any) => {
@@ -291,11 +244,6 @@ export class Stylizer {
           });
         }
       });
-      
-      // Re-inject styles after picker is created
-      setTimeout(() => {
-        this.injectGlobalStyles();
-      }, 200);
       
       this.fontPickerInstance = picker;
       this.currentFontType = fontType;
@@ -318,19 +266,62 @@ export class Stylizer {
   public async openFontPicker(fontType: FontType = 'primary', mode: FontMode = 'curated'): Promise<void> {
     // If same mode and type, just open existing picker
     if (this.fontPickerInstance && this.currentFontType === fontType && this.currentMode === mode) {
-      this.fontPickerInstance.open();
+      // Listen for 'opened' event before calling open()
+      // Pure event-based - no timeout fallback
+      await new Promise<void>((resolve) => {
+        const onOpened = () => {
+          (this.fontPickerInstance as any).off('opened', onOpened);
+          resolve();
+        };
+        
+        (this.fontPickerInstance as any).on('opened', onOpened);
+        
+        // Open the picker (opened event will fire when DOM is ready)
+        this.fontPickerInstance.open();
+      });
+      
+      // Now DOM is guaranteed to exist - inject styles once
+      this.injectGlobalStyles();
+      
+      // Verify styles were applied by checking if modal exists
+      const modal = document.querySelector('.fpb__modal');
+      if (!modal) {
+        throw new Error('JSFontPicker modal DOM not found after opened event fired');
+      }
+      
       return;
     }
     
     // Otherwise, initialize with new settings
     await this.initializeFontPicker(fontType, mode);
     
-    // Open the picker
-    setTimeout(() => {
-      if (this.fontPickerInstance) {
-        this.fontPickerInstance.open();
-      }
-    }, 100);
+    // Open the picker and wait for 'opened' event (fires after modal DOM is ready and transition complete)
+    if (!this.fontPickerInstance) {
+      throw new Error('FontPicker instance not available');
+    }
+    
+    // Listen for 'opened' event before calling open()
+    // Pure event-based - no timeout fallback
+    await new Promise<void>((resolve) => {
+      const onOpened = () => {
+        (this.fontPickerInstance as any).off('opened', onOpened);
+        resolve();
+      };
+      
+      (this.fontPickerInstance as any).on('opened', onOpened);
+      
+      // Now open the picker (opened event will fire when DOM is ready)
+      this.fontPickerInstance!.open();
+    });
+    
+    // Now DOM is guaranteed to exist - inject styles once
+    this.injectGlobalStyles();
+    
+    // Verify styles were applied by checking if modal exists
+    const modal = document.querySelector('.fpb__modal');
+    if (!modal) {
+      throw new Error('JSFontPicker modal DOM not found after opened event fired');
+    }
   }
 
   /**
@@ -365,7 +356,7 @@ export class Stylizer {
   }
 
   /**
-   * Apply font to CSS variable
+   * Apply font to CSS variables
    */
   private async applyFont(fontType: FontType, fontInfo: FontInfo): Promise<void> {
     if (typeof document === 'undefined') return;
@@ -373,18 +364,19 @@ export class Stylizer {
     // Load Google Font if needed
     await this.loadGoogleFont(fontInfo.family);
     
-    const cssVariable = fontType === 'primary' 
+    const cssVars = fontType === 'primary' 
       ? this.config.cssVariables.primary 
       : this.config.cssVariables.secondary;
     
-    // Build CSS font value with weight and style
-    const fontStyle = fontInfo.italic ? 'italic' : 'normal';
-    const cssValue = `"${fontInfo.family}", sans-serif`;
+    // Build CSS values
+    const fontFamilyValue = `"${fontInfo.family}", sans-serif`;
+    const fontWeightValue = fontInfo.weight.toString();
+    const fontStyleValue = fontInfo.italic ? 'italic' : 'normal';
     
-    // Update CSS variable on document root (family only for now)
-    // Note: Weight and italic are stored in state but not in CSS variable
-    // CSS variables don't support font-weight/font-style directly
-    document.documentElement.style.setProperty(cssVariable, cssValue);
+    // Update all three CSS variables on document root
+    document.documentElement.style.setProperty(cssVars.family, fontFamilyValue);
+    document.documentElement.style.setProperty(cssVars.weight, fontWeightValue);
+    document.documentElement.style.setProperty(cssVars.style, fontStyleValue);
     
     // Update state with full font information
     if (fontType === 'primary') {
@@ -406,7 +398,7 @@ export class Stylizer {
       fontFamily: fontInfo.family,
       weight: fontInfo.weight,
       italic: fontInfo.italic,
-      cssVariable
+      cssVariables: cssVars
     });
     
     // Emit custom event with full font information
@@ -417,7 +409,7 @@ export class Stylizer {
           fontFamily: fontInfo.family,
           weight: fontInfo.weight,
           italic: fontInfo.italic,
-          cssVariable
+          cssVariables: cssVars
         },
         bubbles: true,
         composed: true
@@ -513,12 +505,6 @@ export class Stylizer {
     if (this.globalStyleElement && this.globalStyleElement.parentNode) {
       this.globalStyleElement.parentNode.removeChild(this.globalStyleElement);
       this.globalStyleElement = null;
-    }
-    
-    // Remove font picker CSS
-    if (this.fontPickerCSSLink && this.fontPickerCSSLink.parentNode) {
-      this.fontPickerCSSLink.parentNode.removeChild(this.fontPickerCSSLink);
-      this.fontPickerCSSLink = null;
     }
     
     // Reset instance

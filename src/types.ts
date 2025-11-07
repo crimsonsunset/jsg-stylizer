@@ -19,7 +19,11 @@ export interface FontChangedEventDetail {
   fontFamily: string;
   weight: number;
   italic: boolean;
-  cssVariable: string;
+  cssVariables: {
+    family: string;
+    weight: string;
+    style: string;
+  };
 }
 
 export interface FontResetEventDetail {

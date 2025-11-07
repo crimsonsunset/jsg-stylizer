@@ -3,7 +3,7 @@
 ## Current Status
 
 **Last Updated**: November 6, 2025  
-**Current Phase**: Phase 1 Complete ✅ | Phase 2 Next
+**Current Phase**: Phase 2 Complete ✅ | Phase 3 Next
 
 ### Phase 1: Foundation & Config System ✅ **COMPLETE**
 
@@ -45,7 +45,7 @@
 - ✅ Linting: No errors
 - ✅ All success criteria met
 
-**Next**: Phase 2 - Sidebar Component (Preact)
+**Next**: Phase 3 - Font Picker Integration
 
 ## Overview
 
@@ -152,41 +152,53 @@ Stylizer.configure({
 - CSS injection uses link tag approach (works in Vite dev server)
 - Font picker modal positioning handled by existing global styles
 
-### Phase 2: Sidebar Component (Preact) ⏳ **NEXT**
+### Phase 2: Sidebar Component (Preact) ✅ **COMPLETE**
 
-**Status**: ⏳ Pending  
+**Status**: ✅ Complete - November 6, 2025  
 **Goal**: Build the main sidebar UI with Preact, including collapse/expand behavior
 
 **Tasks**:
-1. Create `src/components/Sidebar.tsx` - Main sidebar container with collapse/expand state
-2. Create `src/components/SidebarHeader.tsx` - Sticky header with title and close (X) button
-3. Create `src/components/CollapsedButton.tsx` - Small button in top-right when collapsed
-4. Create `src/components/FontSection.tsx` - Primary/secondary font sections
-5. Create `src/components/FontDetails.tsx` - Display font info (`FontFamily | Weight | Numeric`)
-6. Create `src/components/ThemePreview.tsx` - CSS variable display
-7. Create `src/components/styles.css` - Sidebar styles (slide-in animation, collapsed button styles)
-8. Mount Preact app to DOM in `Stylizer.ts`
+1. ✅ Create `src/components/Sidebar.tsx` - Main sidebar container with collapse/expand state
+2. ✅ Create `src/components/SidebarHeader.tsx` - Sticky header with title and close (X) button
+3. ✅ Create `src/components/CollapsedButton.tsx` - Small button in top-right when collapsed
+4. ✅ Create `src/components/FontSection.tsx` - Primary/secondary font sections
+5. ✅ Create `src/components/FontDetails.tsx` - Display font info (removed font name, shows weight only)
+6. ✅ Create `src/components/ThemePreview.tsx` - CSS variable display (sticky to bottom)
+7. ✅ Create `src/components/styles.css` - Sidebar styles (slide-in animation, collapsed button styles)
+8. ✅ Mount Preact app to DOM in `Stylizer.ts`
 
-**Files to Create**:
-- `src/components/Sidebar.tsx` - Main container with collapse/expand logic
-- `src/components/SidebarHeader.tsx` - Header with X button
-- `src/components/CollapsedButton.tsx` - Small button when sidebar is collapsed
-- `src/components/FontSection.tsx` - Primary/secondary font sections
-- `src/components/FontDetails.tsx` - Display font info
-- `src/components/ThemePreview.tsx` - CSS variable display
-- `src/components/styles.css` - Sidebar and collapsed button styles
+**Files Created**:
+- ✅ `src/components/Sidebar.tsx` - Main container with collapse/expand logic
+- ✅ `src/components/SidebarHeader.tsx` - Header with X button
+- ✅ `src/components/CollapsedButton.tsx` - Small button when sidebar is collapsed
+- ✅ `src/components/FontSection.tsx` - Primary/secondary font sections
+- ✅ `src/components/FontDetails.tsx` - Display font info (weight only)
+- ✅ `src/components/ThemePreview.tsx` - CSS variable display
+- ✅ `src/components/styles.css` - Sidebar and collapsed button styles
+- ✅ `src/components/theme.ts` - Dark theme configuration
 
-**Key Features**:
-- Visible by default on page load
-- Slide-in from right animation
-- Sticky header with close (X) button
-- Close button collapses to small button in top-right corner
-- Small button reopens full sidebar
-- Scrollable content area
-- Font selection buttons (primary/secondary)
-- **Mode toggle buttons** (Curated / Browse All) - UI for Browse All mode
-- Real-time font display updates
-- Theme preview at bottom
+**Key Features Implemented**:
+- ✅ Visible by default on page load
+- ✅ Slide-in from right animation
+- ✅ Sticky header with close (X) button
+- ✅ Close button collapses to small button in top-right corner
+- ✅ Small button reopens full sidebar
+- ✅ Scrollable content area
+- ✅ Font selection buttons (primary/secondary) - side-by-side layout
+- ✅ Mode buttons (Curated / Browse All) - UI for Browse All mode
+- ✅ Real-time font display updates
+- ✅ Theme preview sticky to bottom of sidebar
+- ✅ Font weight display (removed font name from display)
+- ✅ Default fonts: Changa One (primary), Nova Square (secondary)
+- ✅ Collapsed button positioning (to left of GitHub button when collapsed)
+
+**Additional Improvements**:
+- ✅ Buttons arranged side-by-side (Title Case)
+- ✅ Font name removed from display (shows weight only)
+- ✅ Theme preview displays actual font format: "Primary Font: Changa One | 400"
+- ✅ Demo page text format matches sidebar preview
+- ✅ Demo page header layout improved (75px height, proper spacing)
+- ✅ Theme toggle button removed from demo page
 
 ### Phase 3: Font Picker Integration
 
@@ -386,26 +398,26 @@ interface StylizerConfig {
 - [x] Font picker integration functional ✅ (Phase 1)
 - [x] CSS variables update correctly ✅ (Phase 1)
 - [x] No Web Component code remains ✅ (Phase 1)
-- [ ] Sidebar mounts and displays correctly (visible by default) ⏳ Phase 2
-- [ ] Collapse/expand works (X button → small button → reopen) ⏳ Phase 2
-- [ ] Font changes update sidebar in real-time ⏳ Phase 2
+- [x] Sidebar mounts and displays correctly (visible by default) ✅ (Phase 2)
+- [x] Collapse/expand works (X button → small button → reopen) ✅ (Phase 2)
+- [x] Font changes update sidebar in real-time ✅ (Phase 2)
 - [ ] Works in all target frameworks ⏳ Phase 7
 - [ ] Bundle size reasonable (< 50KB gzipped) ⏳ Phase 7
 - [ ] Documentation complete ⏳ Phase 6
-- [ ] Demo site updated ⏳ Phase 6
-- [ ] State persists across reloads ⏳ Phase 4
+- [x] Demo site updated ✅ (Phase 2 - header, text formatting, layout improvements)
+- [x] State persists across reloads ✅ (Phase 2 - localStorage for collapsed state)
 
 ## Timeline Estimate
 
 - **Phase 1**: ✅ Complete (November 6, 2025) - 1 day actual
-- **Phase 2**: 2-3 days (Sidebar UI + collapse/expand) ⏳ Next
+- **Phase 2**: ✅ Complete (November 6, 2025) - 1 day actual
 - **Phase 3**: 1-2 days (Font Picker) - Mostly done, needs sidebar integration
-- **Phase 4**: 1-2 days (State/Events) - Partially done, needs Preact hooks
+- **Phase 4**: ✅ Mostly complete (State/Events) - Preact hooks implemented, events working
 - **Phase 5**: ✅ Mostly complete (Config API done in Phase 1) - May need minor updates
 - **Phase 6**: 1 day (Cleanup)
 - **Phase 7**: 2-3 days (Testing)
 
-**Total**: ~10-15 days estimated | ~1 day completed
+**Total**: ~10-15 days estimated | ~2 days completed
 
 ## Notes
 
@@ -414,8 +426,11 @@ interface StylizerConfig {
 - Theme concepts transfer directly ✅
 - Demo site structure mostly reusable ✅
 - Build setup needs Preact plugin addition ✅ Done
-- Collapsed button should be small, unobtrusive, top-right positioned
-- Browse All mode backend complete, UI controls needed in Phase 2
+- Collapsed button should be small, unobtrusive, top-right positioned ✅ Done (positioned to left of GitHub button)
+- Browse All mode backend complete, UI controls added ✅ (Phase 2)
 - CSS injection working via link tag (Vite dev server serves from node_modules)
-- Test page (`test-phase1.html`) created for validation
+- Default fonts updated: Changa One (primary), Nova Square (secondary)
+- Font picker integration working - buttons trigger modal correctly
+- Theme preview sticky to bottom of sidebar for better UX
+- Demo page improvements: header layout (75px height), text formatting, removed theme toggle
 

@@ -2,34 +2,25 @@
  * Demo site interactivity
  */
 
-// Listen to Stylizer font changes
-const stylizer = document.querySelector('jsg-stylizer');
-if (stylizer) {
-  // Configure button via buttonConfig property
-  stylizer.buttonConfig = {
-    preset: 'primary',
-    text: 'Click here to change fonts'
-  };
+// Listen to Stylizer font changes via window events
+window.addEventListener('stylizer-font-changed', (e) => {
+  console.log('Font changed:', e.detail);
   
-  stylizer.addEventListener('font-changed', (e) => {
-    console.log('Font changed:', e.detail);
-    
-    // Update demo text to show the change
-    const { fontType, fontFamily, weight, italic } = e.detail;
-    const italicText = italic ? ' italic' : '';
-    if (fontType === 'primary') {
-      document.getElementById('demo-primary').textContent = `Primary Font: ${fontFamily} | ${weight}${italicText}`;
-    } else {
-      document.getElementById('demo-secondary').textContent = `Secondary Font: ${fontFamily} | ${weight}${italicText}`;
-    }
-  });
-  
-  stylizer.addEventListener('font-reset', (e) => {
-    console.log('Fonts reset:', e.detail);
-    document.getElementById('demo-primary').textContent = 'Primary Font: Changa One | 400';
-    document.getElementById('demo-secondary').textContent = 'Secondary Font: Nova Square | 400';
-  });
-}
+  // Update demo text to show the change
+  const { fontType, fontFamily, weight, italic } = e.detail;
+  const italicText = italic ? ' italic' : '';
+  if (fontType === 'primary') {
+    document.getElementById('demo-primary').textContent = `Primary Font: ${fontFamily} | ${weight}${italicText}`;
+  } else {
+    document.getElementById('demo-secondary').textContent = `Secondary Font: ${fontFamily} | ${weight}${italicText}`;
+  }
+});
+
+window.addEventListener('stylizer-font-reset', (e) => {
+  console.log('Fonts reset:', e.detail);
+  document.getElementById('demo-primary').textContent = 'Primary Font: Changa One | 400';
+  document.getElementById('demo-secondary').textContent = 'Secondary Font: Nova Square | 400';
+});
 
 // Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {

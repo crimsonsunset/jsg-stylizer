@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stylizer - Universal Font Picker Web Component</title>
+  <title>Stylizer - Config-Driven Font Picker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
   <header class="header">
     <div class="container">
       <div class="header-content">
-        <h1 class="logo">🎨 JSG Stylizer</h1>
+        <h1 class="logo">🎨 Stylizer</h1>
         <div class="header-actions">
           <a href="https://github.com/crimsonsunset/jsg-stylizer" class="btn-icon" aria-label="GitHub">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -31,24 +31,17 @@
   <section class="hero">
     <div class="container">
       <div class="hero-content">
-        <h2 class="hero-title">Universal Font Picker Web Component</h2>
-        <p class="hero-subtitle">Framework-agnostic font experimentation tool. Preact bundled, zero framework dependencies - works everywhere.</p>
+        <h2 class="hero-title">Config-Driven Font Picker</h2>
+        <p class="hero-subtitle">Framework-agnostic font experimentation tool with DevTools sidebar. Preact bundled, zero framework dependencies - works everywhere.</p>
         <div class="hero-actions">
           <a href="#installation" class="btn btn-primary">Get Started</a>
-          <a href="https://www.npmjs.com/package/@jsg/stylizer" class="btn btn-secondary">npm →</a>
+          <a href="https://github.com/crimsonsunset/jsg-stylizer" class="btn btn-secondary">GitHub →</a>
         </div>
         <!-- Live Demo Component -->
         <div class="demo-preview">
           <h3 class="demo-title" id="demo-primary">Primary Font: Changa One | 400</h3>
           <h4 class="demo-subtitle" id="demo-secondary">Secondary Font: Nova Square | 400</h4>
-          <div class="demo-stylizer">
-            <jsg-stylizer 
-              is-development="true"
-              default-primary-font="Inter"
-              default-secondary-font="JetBrains Mono"
-              preview-text="Build. Lead. Learn. JSG Tech Check.">
-            </jsg-stylizer>
-          </div>
+          <p class="demo-note">Use the Stylizer sidebar on the right to change fonts!</p>
         </div>
       </div>
     </div>
@@ -87,7 +80,17 @@
         <div class="feature-card">
           <div class="feature-icon">🎭</div>
           <h3>Font Variants</h3>
-          <p>Select font weights and italic styles</p>
+          <p>Select font weights (100-900) and italic styles</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🛠️</div>
+          <h3>DevTools Sidebar</h3>
+          <p>Slide-in panel for easy font selection</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📦</div>
+          <h3>Tiny Bundle</h3>
+          <p>Lightweight with minimal dependencies</p>
         </div>
       </div>
     </div>
@@ -104,35 +107,57 @@
 &lt;head&gt;
   &lt;style&gt;
     :root {
-      --font-primary: "Roboto", sans-serif;
-      --font-secondary: "Open Sans", sans-serif;
+      --font-primary-family: "Changa One", sans-serif;
+      --font-primary-weight: 400;
+      --font-primary-style: normal;
+      --font-secondary-family: "Nova Square", sans-serif;
+      --font-secondary-weight: 400;
+      --font-secondary-style: normal;
     }
     
     body {
-      font-family: var(--font-primary);
+      font-family: var(--font-primary-family);
+      font-weight: var(--font-primary-weight);
+      font-style: var(--font-primary-style);
     }
     
     h1, h2, h3 {
-      font-family: var(--font-secondary);
+      font-family: var(--font-secondary-family);
+      font-weight: var(--font-secondary-weight);
+      font-style: var(--font-secondary-style);
     }
   &lt;/style&gt;
 &lt;/head&gt;
 &lt;body&gt;
   &lt;h1&gt;Hello Stylizer!&lt;/h1&gt;
   
-  &lt;jsg-stylizer 
-    is-development="true"
-    default-primary-font="Roboto"
-    default-secondary-font="Open Sans"&gt;
-  &lt;/jsg-stylizer&gt;
-  
   &lt;script type="module"&gt;
-    import '@jsg/stylizer';
+    import { Stylizer } from '@jsg/stylizer';
     
-    document.querySelector('jsg-stylizer')
-      .addEventListener('font-changed', (e) =&gt; {
-        console.log('Font changed:', e.detail);
-      });
+    // Configure Stylizer
+    Stylizer.configure({
+      fonts: {
+        primary: 'Changa One',
+        secondary: 'Nova Square'
+      },
+      cssVariables: {
+        primary: {
+          family: '--font-primary-family',
+          weight: '--font-primary-weight',
+          style: '--font-primary-style'
+        },
+        secondary: {
+          family: '--font-secondary-family',
+          weight: '--font-secondary-weight',
+          style: '--font-secondary-style'
+        }
+      }
+    });
+    
+    // Listen to font changes
+    window.addEventListener('stylizer-font-changed', (e) =&gt; {
+      console.log('Font changed:', e.detail);
+    });
   &lt;/script&gt;
 &lt;/body&gt;
 &lt;/html&gt;</code></pre>
@@ -146,14 +171,17 @@
       <h2 class="section-title">Installation</h2>
       <div class="install-options">
         <div class="install-card">
-          <h3>npm</h3>
-          <pre><code>npm install @jsg/stylizer</code></pre>
+          <h3>npm (from GitHub)</h3>
+          <pre><code>npm install github:crimsonsunset/jsg-stylizer</code></pre>
         </div>
         <div class="install-card">
-          <h3>CDN</h3>
-          <pre><code>&lt;script type="module" src="https://unpkg.com/@jsg/stylizer"&gt;&lt;/script&gt;</code></pre>
+          <h3>Git Clone</h3>
+          <pre><code>git clone https://github.com/crimsonsunset/jsg-stylizer.git
+cd jsg-stylizer
+npm install</code></pre>
         </div>
       </div>
+      <p class="install-note">📦 Not yet published to npm. Install directly from GitHub repository.</p>
     </div>
   </section>
 
@@ -161,7 +189,7 @@
   <footer class="footer">
     <div class="container">
       <p>Made with ❤️ by <a href="https://jsg-tech-check.com">JSG Tech Check</a></p>
-      <p><a href="https://github.com/crimsonsunset/jsg-stylizer">GitHub</a> • <a href="https://www.npmjs.com/package/@jsg/stylizer">npm</a></p>
+      <p><a href="https://github.com/crimsonsunset/jsg-stylizer">GitHub Repository</a></p>
     </div>
   </footer>
 
