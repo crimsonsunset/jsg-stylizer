@@ -1,9 +1,8 @@
 /**
- * FontSection - Font selection UI with primary/secondary sections and mode toggle
+ * FontSection - Font selection UI with primary/secondary sections
  */
 
-import { Pane, Button, Text, Heading } from 'evergreen-ui';
-import { FontDetails } from './FontDetails';
+import { Pane, Button, Heading } from 'evergreen-ui';
 import type { FontType, FontMode } from '../types';
 
 interface FontSectionProps {
@@ -34,51 +33,32 @@ export function FontSection({
   const buttonText = fontType === 'primary' ? 'Select Primary Font' : 'Select Secondary Font';
 
   return (
-    <Pane padding={16} borderBottom="muted">
-      <Heading size={400} marginBottom={12}>
+    <Pane paddingX={16} paddingY={12} borderBottom="muted">
+      <Heading size={400} marginBottom={8} color="#FFFFFF">
         {label}
       </Heading>
-      
-      <Pane marginBottom={12}>
-        <FontDetails fontFamily={fontFamily} weight={weight} numeric={numeric} />
-      </Pane>
-      
-      <Pane marginBottom={12}>
+
+      <Pane display="flex" flexDirection="column" gap={8}>
         <Button
           appearance="primary"
-          onClick={() => onSelectFont(fontType, mode)}
+          onClick={() => onSelectFont(fontType, 'curated')}
           width="100%"
         >
-          {buttonText}
+          browse curated font list
         </Button>
-      </Pane>
-      
-      <Pane>
-        <Text size={300} color="muted" marginBottom={8} display="block">
-          Mode:
-        </Text>
-        <Pane display="flex" gap={8}>
-          <Button
-            appearance={mode === 'curated' ? 'primary' : 'default'}
-            onClick={() => onModeChange('curated')}
-            flex={1}
-          >
-            Curated
-          </Button>
-          <Button
-            appearance={mode === 'all' ? 'primary' : 'default'}
-            onClick={() => onModeChange('all')}
-            flex={1}
-            disabled={!hasApiKey}
-            title={!hasApiKey ? 'Browse All mode requires Google Fonts API key' : ''}
-          >
-            Browse All
-          </Button>
-        </Pane>
+        <Button
+          appearance="primary"
+          onClick={() => onSelectFont(fontType, 'all')}
+          width="100%"
+          disabled={!hasApiKey}
+          title={!hasApiKey ? 'Browse All mode requires Google Fonts API key' : ''}
+        >
+          browse all google fonts
+        </Button>
         {!hasApiKey && (
-          <Text size={300} color="muted" marginTop={8} display="block">
+          <Pane fontSize={11} color="muted" marginTop={-4}>
             API key required for Browse All mode
-          </Text>
+          </Pane>
         )}
       </Pane>
     </Pane>

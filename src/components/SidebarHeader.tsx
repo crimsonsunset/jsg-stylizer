@@ -22,7 +22,8 @@ export function SidebarHeader({ onClose }: SidebarHeaderProps) {
       display="flex"
       alignItems="center"
       justifyContent="space-between"
-      padding={16}
+      paddingX={8}
+      paddingY={6}
       borderBottom={`1px solid ${borderColor}`}
       position="sticky"
       top={0}

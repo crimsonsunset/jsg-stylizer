@@ -1,6 +1,6 @@
 /**
- * ThemePreview - Display current CSS variable values
- * Read-only preview section showing theme configuration
+ * ThemePreview - Display current font selections
+ * Shows font name and weight in format: "Primary: NAME | WEIGHT"
  */
 
 import { Pane, Text, Heading } from 'evergreen-ui';
@@ -11,63 +11,59 @@ interface ThemePreviewProps {
 }
 
 /**
- * Theme preview component displaying CSS variable values
+ * Extract font name from CSS variable value
+ * Handles formats like: "FontName", sans-serif or "FontName"
+ */
+function extractFontName(cssValue: string): string {
+  if (!cssValue || cssValue === 'Not set') return 'Not set';
+  
+  // Remove quotes and extract font name (before first comma)
+  const match = cssValue.match(/^"?([^",]+)"?/);
+  return match ? match[1].trim() : cssValue;
+}
+
+/**
+ * Extract font weight from CSS variable (defaults to 400 if not found)
+ * For now, we default to 400 as weight isn't stored separately
+ */
+function extractFontWeight(cssValue: string): string {
+  // Weight isn't currently stored in CSS variable, default to 400
+  // TODO: Store weight when font picker supports it
+  return '400';
+}
+
+/**
+ * Theme preview component displaying font selections
  */
 export function ThemePreview({ config }: ThemePreviewProps) {
   const getCSSVariableValue = (variableName: string): string => {
-    if (typeof document === 'undefined') return 'N/A';
+    if (typeof document === 'undefined') return 'Not set';
     const value = getComputedStyle(document.documentElement)
       .getPropertyValue(variableName)
       .trim();
     return value || 'Not set';
   };
 
+  const primaryValue = getCSSVariableValue(config.cssVariables.primary);
+  const secondaryValue = getCSSVariableValue(config.cssVariables.secondary);
+  
+  const primaryFont = extractFontName(primaryValue);
+  const secondaryFont = extractFontName(secondaryValue);
+  const primaryWeight = extractFontWeight(primaryValue);
+  const secondaryWeight = extractFontWeight(secondaryValue);
+
   return (
-    <Pane padding={16} borderTop="muted">
-      <Heading size={400} marginBottom={12}>
+    <Pane paddingX={16} paddingY={12} borderTop="muted">
+      <Heading size={400} marginBottom={8} color="#FFFFFF">
         Theme Preview
       </Heading>
-      <Pane display="flex" flexDirection="column" gap={8}>
-        <Pane display="flex" justifyContent="space-between">
-          <Text size={300} color="muted">
-            Primary Font:
-          </Text>
-          <Text size={300} fontFamily={getCSSVariableValue(config.cssVariables.primary)}>
-            {getCSSVariableValue(config.cssVariables.primary)}
-          </Text>
-        </Pane>
-        <Pane display="flex" justifyContent="space-between">
-          <Text size={300} color="muted">
-            Secondary Font:
-          </Text>
-          <Text size={300} fontFamily={getCSSVariableValue(config.cssVariables.secondary)}>
-            {getCSSVariableValue(config.cssVariables.secondary)}
-          </Text>
-        </Pane>
-        {config.theme.background && (
-          <Pane display="flex" justifyContent="space-between">
-            <Text size={300} color="muted">
-              Background:
-            </Text>
-            <Text size={300}>{getCSSVariableValue(config.theme.background)}</Text>
-          </Pane>
-        )}
-        {config.theme.text && (
-          <Pane display="flex" justifyContent="space-between">
-            <Text size={300} color="muted">
-              Text:
-            </Text>
-            <Text size={300}>{getCSSVariableValue(config.theme.text)}</Text>
-          </Pane>
-        )}
-        {config.theme.accent && (
-          <Pane display="flex" justifyContent="space-between">
-            <Text size={300} color="muted">
-              Accent:
-            </Text>
-            <Text size={300}>{getCSSVariableValue(config.theme.accent)}</Text>
-          </Pane>
-        )}
+      <Pane display="flex" flexDirection="column" gap={6}>
+        <Text size={300} color="muted">
+          Primary: {primaryFont} | {primaryWeight}
+        </Text>
+        <Text size={300} color="muted">
+          Secondary: {secondaryFont} | {secondaryWeight}
+        </Text>
       </Pane>
     </Pane>
   );

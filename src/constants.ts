@@ -62,8 +62,8 @@ export const SYSTEM_FONTS = [
 
 // Default configuration
 export const DEFAULT_CONFIG = {
-  primaryFont: "Roboto",
-  secondaryFont: "Open Sans",
+  primaryFont: "Stalinist One",
+  secondaryFont: "Audiowide",
   previewText: "The quick brown fox jumps over the lazy dog",
   cssVariablePrimary: "--font-primary",
   cssVariableSecondary: "--font-secondary",

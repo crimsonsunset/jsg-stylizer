@@ -37,8 +37,6 @@ function Sidebar({ config, initialFonts }: SidebarProps) {
   });
   
   const [fonts, setFonts] = useState(initialFonts);
-  const [primaryMode, setPrimaryMode] = useState<FontMode>('curated');
-  const [secondaryMode, setSecondaryMode] = useState<FontMode>('curated');
 
   // Listen to font change events
   useEffect(() => {
@@ -115,12 +113,8 @@ function Sidebar({ config, initialFonts }: SidebarProps) {
       {<SidebarContent
         config={config}
         fonts={fonts}
-        primaryMode={primaryMode}
-        secondaryMode={secondaryMode}
         onClose={handleClose}
         onSelectFont={handleSelectFont}
-        onPrimaryModeChange={setPrimaryMode}
-        onSecondaryModeChange={setSecondaryMode}
         hasApiKey={hasApiKey}
       /> as any}
     </ThemeProvider>
@@ -130,12 +124,8 @@ function Sidebar({ config, initialFonts }: SidebarProps) {
 interface SidebarContentProps {
   config: InternalConfig;
   fonts: { primary: string; secondary: string };
-  primaryMode: FontMode;
-  secondaryMode: FontMode;
   onClose: () => void;
   onSelectFont: (fontType: FontType, mode: FontMode) => void;
-  onPrimaryModeChange: (mode: FontMode) => void;
-  onSecondaryModeChange: (mode: FontMode) => void;
   hasApiKey: boolean;
 }
 
@@ -145,12 +135,8 @@ interface SidebarContentProps {
 function SidebarContent({
   config,
   fonts,
-  primaryMode,
-  secondaryMode,
   onClose,
   onSelectFont,
-  onPrimaryModeChange,
-  onSecondaryModeChange,
   hasApiKey
 }: SidebarContentProps) {
   const theme = useTheme();
@@ -176,19 +162,15 @@ function SidebarContent({
       <Pane flex={1} overflowY="auto">
         <FontSection
           fontType="primary"
-          fontFamily={fonts.primary}
-          mode={primaryMode}
+          mode="curated"
           onSelectFont={onSelectFont}
-          onModeChange={onPrimaryModeChange}
           hasApiKey={hasApiKey}
         />
         
         <FontSection
           fontType="secondary"
-          fontFamily={fonts.secondary}
-          mode={secondaryMode}
+          mode="curated"
           onSelectFont={onSelectFont}
-          onModeChange={onSecondaryModeChange}
           hasApiKey={hasApiKey}
         />
         

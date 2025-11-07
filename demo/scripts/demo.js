@@ -68,5 +68,3 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   }
   console.warn('⚠️ JSG Logger not available after initialization. Make sure Stylizer component is loaded.');
 })();
-
-

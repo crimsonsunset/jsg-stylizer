@@ -11,6 +11,7 @@ export default defineConfig(({ mode }) => {
 
   // Load env vars from project root (where vite.config.ts is located)
   // loadEnv looks for .env files relative to the root parameter
+  // Empty prefix '' means load all env vars, but Vite only exposes VITE_ prefixed vars to client
   const env = loadEnv(mode, resolve(__dirname), '');
 
   if (isDemoMode) {
@@ -35,7 +36,9 @@ export default defineConfig(({ mode }) => {
       },
       define: {
         // Explicitly define env vars for client access
-        'import.meta.env.VITE_GOOGLE_FONTS_API_KEY': JSON.stringify(env.VITE_GOOGLE_FONTS_API_KEY || '')
+        // Vite automatically exposes VITE_ prefixed vars, but we define it explicitly to ensure it's available
+        'import.meta.env.VITE_GOOGLE_FONTS_API_KEY': JSON.stringify(env.VITE_GOOGLE_FONTS_API_KEY || ''),
+        'import.meta.env.PUBLIC_GOOGLE_FONTS_API_KEY': JSON.stringify(env.PUBLIC_GOOGLE_FONTS_API_KEY || '')
       }
     };
   }
