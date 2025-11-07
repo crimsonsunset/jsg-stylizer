@@ -1,7 +1,8 @@
 import { defineConfig, loadEnv } from 'vite';
 import { resolve } from 'path';
+import preact from '@preact/preset-vite';
 
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ mode }) => {
   // Check if we're building or serving the demo
   const isDemoMode = process.env.BUILD_DEMO === 'true' || 
                      process.env.DEMO_MODE === 'true' ||
@@ -14,6 +15,7 @@ export default defineConfig(({ command, mode }) => {
   if (isDemoMode) {
     // Demo build/dev server configuration
     return {
+      plugins: [preact()],
       root: 'demo',
       envDir: resolve(__dirname), // Look for .env in project root, not demo directory
       build: {
@@ -37,6 +39,7 @@ export default defineConfig(({ command, mode }) => {
 
   // Library build configuration (default)
   return {
+    plugins: [preact()],
     build: {
       lib: {
         entry: resolve(__dirname, 'src/index.ts'),
