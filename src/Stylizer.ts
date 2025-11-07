@@ -261,41 +261,9 @@ export class Stylizer {
   }
 
   /**
-   * Open font picker
+   * Wait for the picker to open by listening for the 'opened' event
    */
-  public async openFontPicker(fontType: FontType = 'primary', mode: FontMode = 'curated'): Promise<void> {
-    // If same mode and type, just open existing picker
-    if (this.fontPickerInstance && this.currentFontType === fontType && this.currentMode === mode) {
-      // Listen for 'opened' event before calling open()
-      // Pure event-based - no timeout fallback
-      await new Promise<void>((resolve) => {
-        const onOpened = () => {
-          (this.fontPickerInstance as any).off('opened', onOpened);
-          resolve();
-        };
-        
-        (this.fontPickerInstance as any).on('opened', onOpened);
-        
-        // Open the picker (opened event will fire when DOM is ready)
-        this.fontPickerInstance.open();
-      });
-      
-      // Now DOM is guaranteed to exist - inject styles once
-      this.injectGlobalStyles();
-      
-      // Verify styles were applied by checking if modal exists
-      const modal = document.querySelector('.fpb__modal');
-      if (!modal) {
-        throw new Error('JSFontPicker modal DOM not found after opened event fired');
-      }
-      
-      return;
-    }
-    
-    // Otherwise, initialize with new settings
-    await this.initializeFontPicker(fontType, mode);
-    
-    // Open the picker and wait for 'opened' event (fires after modal DOM is ready and transition complete)
+  private async waitForPickerOpen(): Promise<void> {
     if (!this.fontPickerInstance) {
       throw new Error('FontPicker instance not available');
     }
@@ -310,8 +278,8 @@ export class Stylizer {
       
       (this.fontPickerInstance as any).on('opened', onOpened);
       
-      // Now open the picker (opened event will fire when DOM is ready)
-      this.fontPickerInstance!.open();
+      // Open the picker (opened event will fire when DOM is ready)
+      this.fontPickerInstance.open();
     });
     
     // Now DOM is guaranteed to exist - inject styles once
@@ -322,6 +290,23 @@ export class Stylizer {
     if (!modal) {
       throw new Error('JSFontPicker modal DOM not found after opened event fired');
     }
+  }
+
+  /**
+   * Open font picker
+   */
+  public async openFontPicker(fontType: FontType = 'primary', mode: FontMode = 'curated'): Promise<void> {
+    // If same mode and type, just open existing picker
+    if (this.fontPickerInstance && this.currentFontType === fontType && this.currentMode === mode) {
+      await this.waitForPickerOpen();
+      return;
+    }
+    
+    // Otherwise, initialize with new settings
+    await this.initializeFontPicker(fontType, mode);
+    
+    // Open the picker and wait for 'opened' event
+    await this.waitForPickerOpen();
   }
 
   /**
