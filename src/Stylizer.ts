@@ -10,6 +10,7 @@ import { globalStyles } from './Stylizer.styles';
 import type { StylizerConfig, InternalConfig } from './config';
 import { mergeConfig, validateConfig, defaultConfig } from './config';
 import JSGLogger from '@crimsonsunset/jsg-logger';
+import { mountSidebar } from './components/Sidebar';
 
 // Initialize logger once at module level
 const loggerInstance = JSGLogger.getInstanceSync({
@@ -47,6 +48,7 @@ export class Stylizer {
   private currentMode: FontMode = 'curated';
   private globalStyleElement: HTMLStyleElement | null = null;
   private fontPickerCSSLink: HTMLLinkElement | HTMLStyleElement | null = null;
+  private sidebarCleanup: (() => void) | null = null;
 
   /**
    * Private constructor for singleton pattern
@@ -84,6 +86,11 @@ export class Stylizer {
     // Apply fonts to CSS variables
     instance.applyFont('primary', instance.fontState.primary);
     instance.applyFont('secondary', instance.fontState.secondary);
+    
+    // Mount sidebar if in browser environment
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      instance.mountSidebar();
+    }
     
     webComponentsLogger.info('Stylizer configured', instance.config);
     return instance;
@@ -244,7 +251,7 @@ export class Stylizer {
       }, 100);
       
       // Listen for font selection
-      picker.on('pick', (font: any) => {
+      (picker as any).on('pick', (font: any) => {
         if (font && font.family) {
           this.applyFont(fontType, font.family.name);
         }
@@ -372,9 +379,30 @@ export class Stylizer {
   }
 
   /**
+   * Mount sidebar component
+   */
+  private mountSidebar(): void {
+    // Cleanup existing sidebar if any
+    if (this.sidebarCleanup) {
+      this.sidebarCleanup();
+      this.sidebarCleanup = null;
+    }
+    
+    // Mount new sidebar
+    this.sidebarCleanup = mountSidebar(this.config, this.fontState);
+    webComponentsLogger.debug('Sidebar mounted');
+  }
+
+  /**
    * Destroy instance and cleanup
    */
   public destroy(): void {
+    // Cleanup sidebar
+    if (this.sidebarCleanup) {
+      this.sidebarCleanup();
+      this.sidebarCleanup = null;
+    }
+    
     // Cleanup JSFontPicker
     if (this.fontPickerInstance) {
       this.fontPickerInstance.destroy();

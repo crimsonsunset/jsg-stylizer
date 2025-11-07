@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stylizer Phase 2 Test - Sidebar</title>
+  <style>
+    :root {
+      --font-primary: "Roboto", sans-serif;
+      --font-secondary: "Open Sans", sans-serif;
+      --background: #ffffff;
+      --text: #000000;
+    }
+    
+    body {
+      font-family: var(--font-primary);
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: var(--background);
+      color: var(--text);
+    }
+    
+    h1 {
+      font-family: var(--font-primary);
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    
+    h2 {
+      font-family: var(--font-secondary);
+      font-size: 1.5rem;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+    
+    .test-section {
+      margin: 2rem 0;
+      padding: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    
+    .test-button {
+      padding: 0.5rem 1rem;
+      margin: 0.5rem;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .test-button:hover {
+      background: #2563eb;
+    }
+    
+    .font-display {
+      padding: 1rem;
+      background: #f3f4f6;
+      border-radius: 4px;
+      margin: 1rem 0;
+    }
+    
+    .font-display.primary {
+      font-family: var(--font-primary);
+    }
+    
+    .font-display.secondary {
+      font-family: var(--font-secondary);
+    }
+  </style>
+</head>
+<body>
+  <h1>Stylizer Phase 2 Test - Sidebar Component</h1>
+  
+  <div class="test-section">
+    <h2>Test Instructions</h2>
+    <ol>
+      <li><strong>Sidebar Visibility:</strong> The sidebar should be visible by default on the right side of the screen</li>
+      <li><strong>Collapse/Expand:</strong> Click the X button in the header to collapse the sidebar. A small button should appear in the top-right corner. Click it to reopen.</li>
+      <li><strong>Font Selection:</strong> Click "Select Primary Font" or "Select Secondary Font" buttons to open the font picker</li>
+      <li><strong>Mode Toggle:</strong> Switch between "Curated" and "Browse All" modes (Browse All requires API key)</li>
+      <li><strong>Real-time Updates:</strong> When you select a font, the sidebar should update immediately</li>
+      <li><strong>Persistence:</strong> Refresh the page - sidebar state should persist (collapsed/expanded)</li>
+    </ol>
+  </div>
+  
+  <div class="test-section">
+    <h2>Font Display Test</h2>
+    <p>The text below should update when you change fonts:</p>
+    
+    <div class="font-display primary">
+      <strong>Primary Font:</strong> This text uses the primary font (var(--font-primary))
+    </div>
+    
+    <div class="font-display secondary">
+      <strong>Secondary Font:</strong> This text uses the secondary font (var(--font-secondary))
+    </div>
+  </div>
+  
+  <div class="test-section">
+    <h2>Console Logging</h2>
+    <p>Open the browser console to see:</p>
+    <ul>
+      <li>Stylizer configuration logs</li>
+      <li>Font change events</li>
+      <li>Sidebar mount/unmount logs</li>
+    </ul>
+  </div>
+  
+  <script type="module">
+    import { Stylizer } from './src/index.ts';
+    
+    // Configure Stylizer
+    Stylizer.configure({
+      fonts: {
+        primary: 'Roboto',
+        secondary: 'Open Sans'
+      },
+      cssVariables: {
+        primary: '--font-primary',
+        secondary: '--font-secondary'
+      },
+      previewText: 'The quick brown fox jumps over the lazy dog'
+    });
+    
+    // Listen to font changes
+    window.addEventListener('stylizer-font-changed', (e) => {
+      console.log('Font changed:', e.detail);
+    });
+    
+    console.log('Stylizer Phase 2 Test initialized');
+    console.log('Current fonts:', Stylizer.getInstance().getFonts());
+  </script>
+</body>
+</html>
+

@@ -27,7 +27,9 @@ export default defineConfig(({ mode }) => {
       },
       resolve: {
         alias: {
-          '@': resolve(__dirname, 'src')
+          '@': resolve(__dirname, 'src'),
+          'react': 'preact/compat',
+          'react-dom': 'preact/compat'
         }
       },
       define: {
@@ -52,7 +54,9 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: {
-        '@': resolve(__dirname, 'src')
+        '@': resolve(__dirname, 'src'),
+        'react': 'preact/compat',
+        'react-dom': 'preact/compat'
       }
     }
   };

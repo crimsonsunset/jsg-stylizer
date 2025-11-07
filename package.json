@@ -28,7 +28,10 @@
   },
   "dependencies": {
     "@crimsonsunset/jsg-logger": "^1.5.5",
+    "@types/react": "^19.2.2",
+    "evergreen-ui": "^7.1.9",
     "fontpicker": "github:wipeautcrafter/jsfontpicker",
+    "lodash.merge": "^4.6.2",
     "preact": "^10.19.0"
   },
   "devDependencies": {
