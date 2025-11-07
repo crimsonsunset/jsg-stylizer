@@ -3,7 +3,7 @@
 ## Current Status
 
 **Last Updated**: November 7, 2025  
-**Current Phase**: Phase 6 Complete ✅ | Phase 7 Next (Testing & Polish)
+**Current Phase**: Phase 6 Complete ✅ | Phase 7 Next (Color Selection & Theme Management)
 
 ### Phase 1: Foundation & Config System ✅ **COMPLETE**
 
@@ -321,7 +321,86 @@ interface StylizerConfig {
 - ✅ `demo/index.html` - Already matches current API (verified)
 - ✅ `demo/scripts/demo.js` - Already uses config API (verified)
 
-### Phase 7: Testing & Polish
+### Phase 7: CSS Variable Color Selection & Theme Management
+
+**Goal**: Add variable-centric color management with framework presets
+
+**Architecture**: Variable-centric, format-agnostic. Stylizer acts as a CSS Variable Editor (not a theme system interpreter), working with any framework's CSS variables through a simple key-value interface.
+
+**Core Innovation**: Zero transform code - presets are just metadata + templates.
+
+**Tasks**:
+1. Install DaisyUI locally to harvest theme CSS values
+2. Create script to extract all ~40 DaisyUI themes from node_modules
+3. Generate preset definitions from DaisyUI themes
+4. Integrate JSColorPicker library (~14.5 KB gzipped)
+5. Add Mustache.js for templating (~3-4 KB gzipped) with @types/mustache
+6. Create color state management in Stylizer.ts
+7. Implement applyColor() method with CSS variable application
+8. Build framework preset definitions (Tailwind, Material, Bootstrap, Radix, Generic)
+9. Implement import/export system (CSS, JSON, JavaScript)
+10. Create UI components (ColorSection, ColorButton, PresetSelector with DaisyUI themes)
+11. Update ThemePreview to show color swatches
+12. Implement color events (stylizer-color-changed, stylizer-theme-changed)
+13. Test all presets and document features
+
+**Main Features**:
+- Edit any CSS variable through color pickers
+- Framework-agnostic (works with DaisyUI, Tailwind, Material, custom vars)
+- Real-time preview in sidebar and page
+- Support for alpha/transparency
+- Framework presets with export to framework-specific formats
+- Import/export: CSS, JSON, JavaScript object
+
+**Files to Create**:
+- `scripts/extract-daisy-themes.js` - Extract DaisyUI themes from node_modules
+- `src/presets/daisy-themes.json` - Generated DaisyUI theme definitions (~40 themes)
+- `src/JSColorPicker.ts` - Integration wrapper
+- `src/JSColorPicker.styles.ts` - Dark theme styling
+- `src/parsers.ts` - Import parsers
+- `src/exporters.ts` - Export logic
+- `src/presets/index.ts` - Preset registry (includes DaisyUI themes)
+- `src/presets/types.ts` - Preset interfaces
+- `src/presets/tailwind.ts` - Tailwind preset structure
+- `src/presets/material.ts` - Material Design 3 preset structure
+- `src/presets/bootstrap.ts` - Bootstrap 5 preset structure
+- `src/presets/radix.ts` - Radix UI preset structure
+- `src/presets/generic.ts` - Generic preset structure
+- `src/components/ColorSection.tsx` - Main color UI
+- `src/components/ColorButton.tsx` - Individual color picker button
+- `src/components/PresetSelector.tsx` - Preset dropdown (DaisyUI themes + framework presets)
+- `src/components/ImportExportModal.tsx` - Import/export modal
+
+**Files to Modify**:
+- `src/Stylizer.ts` - Add color methods
+- `src/config.ts` - Extend for color variables
+- `src/types.ts` - Add color event types
+- `src/constants.ts` - Add preset constants
+- `src/global.d.ts` - Color event declarations
+- `src/components/Sidebar.tsx` - Integrate ColorSection
+- `src/components/ThemePreview.tsx` - Add color swatches
+- `src/components/styles.css` - Color section styles
+- `package.json` - Add mustache + @types/mustache
+- `README.md` - Document color features
+
+**Timeline**: 14-20 hours (2-3 days)
+
+**Dependencies Added**: 
+- `daisyui` (dev dependency - for theme extraction only, not bundled)
+- `mustache` (~3-4 KB gzipped)
+- `@types/mustache` (dev dependency)
+- JSColorPicker via CDN or bundled (~14.5 KB gzipped)
+
+**DaisyUI Theme Harvesting Strategy**:
+- Install DaisyUI as dev dependency
+- Create extraction script (`scripts/extract-daisy-themes.js`)
+- Parse DaisyUI theme files from `node_modules/daisyui/src/theming/themes.js`
+- Generate JSON preset definitions with all ~40 themes
+- Store in `src/presets/daisy-themes.json`
+- Allow users to select from dropdown: "light", "dark", "cupcake", "synthwave", etc.
+- Apply selected DaisyUI theme to any framework (map to their CSS variables)
+
+### Phase 8: Testing & Polish
 
 **Goal**: Test across frameworks, polish UX
 
@@ -336,30 +415,33 @@ interface StylizerConfig {
 8. Ensure responsive design
 9. Test collapse/expand behavior
 10. Test localStorage persistence
+11. Test color selection features across all presets
+12. Verify import/export functionality
 
 **Key Tests**:
 - Config API works
 - Sidebar mounts correctly (visible by default)
 - Collapse/expand works (X button → small button → reopen)
 - Font picker integration works
+- Color picker integration works
 - Events fire correctly
-- CSS variables update
+- CSS variables update (fonts + colors)
 - No framework conflicts
 - State persists across page reloads
+- Import/export round-trips work correctly
 
 ## Future Phases (Post-Rewrite)
 
-### Phase 8: Color Support (Future)
-- Add color picker to sidebar
-- Control existing CSS variables
-- Color preview in theme section
-- Color presets
+### Phase 9: Custom Preset Creation (Future)
+- Users can create/import custom presets
+- Preset sharing and export
+- Community preset repository
 
-### Phase 9: Advanced Features (Future)
-- Export/import configurations
+### Phase 10: Advanced Features (Future)
 - Font pairing suggestions
 - Performance metrics
 - A11y improvements
+- Advanced color features (gradients, color harmonies)
 
 ## Technical Decisions
 
@@ -413,9 +495,12 @@ interface StylizerConfig {
 - [x] Sidebar mounts and displays correctly (visible by default) ✅ (Phase 2)
 - [x] Collapse/expand works (X button → small button → reopen) ✅ (Phase 2)
 - [x] Font changes update sidebar in real-time ✅ (Phase 2)
-- [ ] Works in all target frameworks ⏳ Phase 7
-- [ ] Bundle size reasonable (< 50KB gzipped) ⏳ Phase 7
-- [ ] Documentation complete ⏳ Phase 6
+- [ ] Color selection integrated ⏳ Phase 7
+- [ ] Framework presets working ⏳ Phase 7
+- [ ] Import/export functionality ⏳ Phase 7
+- [ ] Works in all target frameworks ⏳ Phase 8
+- [ ] Bundle size reasonable (< 80KB gzipped with color features) ⏳ Phase 8
+- [ ] Documentation complete ⏳ Phase 7-8
 - [x] Demo site updated ✅ (Phase 2 - header, text formatting, layout improvements)
 - [x] State persists across reloads ✅ (Phase 2 - localStorage for collapsed state)
 
@@ -427,9 +512,10 @@ interface StylizerConfig {
 - **Phase 4**: ✅ Complete (November 7, 2025) - State management and events fully implemented
 - **Phase 5**: ✅ Complete (November 7, 2025) - Config API finalized
 - **Phase 6**: ✅ Complete (November 7, 2025) - Cleanup & migration verified
-- **Phase 7**: ⏳ Pending (Testing & Polish) - 2-3 days estimated
+- **Phase 7**: ⏳ Pending (Color Selection & Theme Management) - 2-3 days estimated
+- **Phase 8**: ⏳ Pending (Testing & Polish) - 2-3 days estimated
 
-**Total**: ~10-15 days estimated | ~6 days completed
+**Total**: ~12-18 days estimated | ~6 days completed
 
 ## Notes
 
