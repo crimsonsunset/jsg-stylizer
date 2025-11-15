@@ -4,7 +4,7 @@
 
 A framework-agnostic font picker that lets you quickly experiment with different Google Fonts on your site. Works in vanilla JavaScript, React, Vue, Svelte, Astro, and any other framework (or no framework at all).
 
-[![npm version](https://img.shields.io/npm/v/@jsg/stylizer.svg)](https://www.npmjs.com/package/@jsg/stylizer)
+[![npm version](https://img.shields.io/npm/v/jsg-stylizer.svg)](https://www.npmjs.com/package/jsg-stylizer)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## ✨ Features
@@ -23,7 +23,7 @@ A framework-agnostic font picker that lets you quickly experiment with different
 ## 📦 Installation
 
 ```bash
-npm install @jsg/stylizer
+npm install jsg-stylizer
 ```
 
 ### CSS Import (Optional)
@@ -31,7 +31,7 @@ npm install @jsg/stylizer
 Stylizer includes CSS that is automatically injected when you import the JavaScript module. If you prefer to import CSS manually (e.g., for better control over loading order), you can import it separately:
 
 ```javascript
-import '@jsg/stylizer/style.css';
+import 'jsg-stylizer/style.css';
 ```
 
 **Note**: All dependencies (Preact, Evergreen UI, fontpicker) are bundled with the package, so no additional peer dependencies are required.
@@ -71,7 +71,7 @@ import '@jsg/stylizer/style.css';
   <h1>Hello Stylizer!</h1>
   
   <script type="module">
-    import { Stylizer } from '@jsg/stylizer';
+    import { Stylizer } from 'jsg-stylizer';
     
     // Configure Stylizer
     Stylizer.configure({
@@ -105,7 +105,7 @@ import '@jsg/stylizer/style.css';
 ### React
 
 ```tsx
-import { Stylizer } from '@jsg/stylizer';
+import { Stylizer } from 'jsg-stylizer';
 import { useEffect } from 'react';
 
 function App() {
@@ -153,7 +153,7 @@ function App() {
 ```svelte
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { Stylizer } from '@jsg/stylizer';
+  import { Stylizer } from 'jsg-stylizer';
   
   onMount(() => {
     Stylizer.configure({
@@ -195,7 +195,7 @@ function App() {
 ```vue
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
-import { Stylizer } from '@jsg/stylizer';
+import { Stylizer } from 'jsg-stylizer';
 
 let handleFontChange: ((e: CustomEvent) => void) | null = null;
 
@@ -244,7 +244,7 @@ onUnmounted(() => {
 
 ```astro
 ---
-import { Stylizer } from '@jsg/stylizer';
+import { Stylizer } from 'jsg-stylizer';
 
 if (import.meta.env.DEV) {
   Stylizer.configure({
@@ -279,7 +279,7 @@ if (import.meta.env.DEV) {
 Configure Stylizer using the `Stylizer.configure()` method:
 
 ```typescript
-import { Stylizer } from '@jsg/stylizer';
+import { Stylizer } from 'jsg-stylizer';
 
 Stylizer.configure({
   fonts?: {
