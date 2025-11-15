@@ -28,11 +28,20 @@ export default defineConfig(({ mode }) => {
         }
       },
       resolve: {
-        alias: {
-          '@': resolve(__dirname, 'src'),
-          'react': 'preact/compat',
-          'react-dom': 'preact/compat'
-        }
+        alias: [
+          {
+            find: '@',
+            replacement: resolve(__dirname, 'src')
+          },
+          {
+            find: 'react',
+            replacement: 'preact/compat'
+          },
+          {
+            find: 'react-dom',
+            replacement: 'preact/compat'
+          }
+        ]
       },
       define: {
         // Explicitly define env vars for client access
