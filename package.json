@@ -25,9 +25,9 @@
     "test": "npm run type-check",
     "demo": "DEMO_MODE=true vite --open",
     "analyze": "npm run build && open dist/stats.html",
-    "release:patch": "git add -A && git commit -m 'chore: prepare for release' || true && echo 'y' | np patch --no-tests --any-branch",
-    "release:minor": "git add -A && git commit -m 'chore: prepare for release' || true && echo 'y' | np minor --no-tests --any-branch",
-    "release:major": "git add -A && git commit -m 'chore: prepare for release' || true && echo 'y' | np major --no-tests --any-branch",
+    "release:patch": "./scripts/release.sh patch",
+    "release:minor": "./scripts/release.sh minor",
+    "release:major": "./scripts/release.sh major",
     "release:first": "npm run build && npm publish"
   },
   "dependencies": {
