@@ -68,11 +68,26 @@ export default defineConfig(({ mode }) => {
       lib: {
         entry: resolve(__dirname, 'src/index.ts'),
         name: 'Stylizer',
-        formats: ['es', 'umd'],
-        fileName: (format) => `index.${format === 'es' ? 'esm' : format}.js`
+        formats: ['es'],
+        fileName: () => 'index.esm.js'
       },
+      cssCodeSplit: false,
+      cssMinify: true,
       sourcemap: true,
-      minify: 'esbuild'
+      minify: 'esbuild',
+      rollupOptions: {
+        output: {
+          inlineDynamicImports: true,
+          manualChunks: undefined,
+          assetFileNames: (assetInfo) => {
+            if (assetInfo.name === 'style.css') {
+              return 'style.css';
+            }
+            return assetInfo.name || 'asset';
+          }
+        },
+        external: []
+      }
     },
     resolve: {
       alias: {

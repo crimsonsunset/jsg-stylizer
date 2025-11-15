@@ -26,6 +26,16 @@ A framework-agnostic font picker that lets you quickly experiment with different
 npm install @jsg/stylizer
 ```
 
+### CSS Import (Optional)
+
+Stylizer includes CSS that is automatically injected when you import the JavaScript module. If you prefer to import CSS manually (e.g., for better control over loading order), you can import it separately:
+
+```javascript
+import '@jsg/stylizer/style.css';
+```
+
+**Note**: All dependencies (Preact, Evergreen UI, fontpicker) are bundled with the package, so no additional peer dependencies are required.
+
 ## 🚀 Quick Start
 
 ### Vanilla JavaScript
