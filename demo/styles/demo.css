@@ -40,12 +40,10 @@
 /* Base styles */
 :root {
   /* Default fonts - will be overridden by Stylizer CSS variables */
-  --font-primary: "Changa One", sans-serif;
-  --font-secondary: "Nova Square", sans-serif;
-  
-  font-family: var(--font-primary);
+  font-family: var(--font-primary-family);
+  font-weight: var(--font-primary-weight);
+  font-style: var(--font-primary-style);
   line-height: 1.5;
-  font-weight: 400;
   color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
@@ -68,7 +66,9 @@ body {
   min-height: 100vh;
   background: linear-gradient(135deg, #1a3d4d 0%, #22577a 100%);
   color: var(--color-text-default);
-  font-family: var(--font-primary);
+  font-family: var(--font-primary-family);
+  font-weight: var(--font-primary-weight);
+  font-style: var(--font-primary-style);
 }
 
 /* Container */
@@ -92,7 +92,9 @@ h1 {
   font-size: 3rem;
   font-weight: 700;
   line-height: 1.2;
-  font-family: var(--font-primary);
+  font-family: var(--font-primary-family);
+  font-weight: var(--font-primary-weight);
+  font-style: var(--font-primary-style);
 }
 
 h2 {
@@ -101,7 +103,9 @@ h2 {
   margin-bottom: 1em;
   font-size: 2rem;
   font-weight: 600;
-  font-family: var(--font-secondary);
+  font-family: var(--font-secondary-family);
+  font-weight: var(--font-secondary-weight);
+  font-style: var(--font-secondary-style);
 }
 
 h3 {
@@ -109,7 +113,9 @@ h3 {
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 0.5em;
-  font-family: var(--font-secondary);
+  font-family: var(--font-secondary-family);
+  font-weight: var(--font-secondary-weight);
+  font-style: var(--font-secondary-style);
 }
 
 p {
@@ -279,7 +285,9 @@ body:not(.stylizer-sidebar-open):not(.stylizer-sidebar-closing) .header-actions 
   line-height: 1.2;
   color: #ffffff;
   text-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  font-family: var(--font-primary);
+  font-family: var(--font-primary-family);
+  font-weight: var(--font-primary-weight);
+  font-style: var(--font-primary-style);
 }
 
 .hero-subtitle {
@@ -287,7 +295,9 @@ body:not(.stylizer-sidebar-open):not(.stylizer-sidebar-closing) .header-actions 
   color: var(--color-text-muted);
   margin-bottom: 2rem;
   line-height: 1.6;
-  font-family: var(--font-secondary);
+  font-family: var(--font-secondary-family);
+  font-weight: var(--font-secondary-weight);
+  font-style: var(--font-secondary-style);
 }
 
 .hero-actions {
@@ -334,7 +344,9 @@ body:not(.stylizer-sidebar-open):not(.stylizer-sidebar-closing) .header-actions 
   font-size: 2rem;
   margin-bottom: 0.5rem;
   color: var(--color-text-default);
-  font-family: var(--font-primary);
+  font-family: var(--font-primary-family);
+  font-weight: var(--font-primary-weight);
+  font-style: var(--font-primary-style);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -344,7 +356,9 @@ body:not(.stylizer-sidebar-open):not(.stylizer-sidebar-closing) .header-actions 
   font-size: 1.5rem;
   margin-bottom: 2rem;
   color: var(--color-primary-light);
-  font-family: var(--font-secondary);
+  font-family: var(--font-secondary-family);
+  font-weight: var(--font-secondary-weight);
+  font-style: var(--font-secondary-style);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -368,7 +382,9 @@ body:not(.stylizer-sidebar-open):not(.stylizer-sidebar-closing) .header-actions 
   text-align: center;
   margin-bottom: 3rem;
   color: var(--color-primary-light);
-  font-family: var(--font-secondary);
+  font-family: var(--font-secondary-family);
+  font-weight: var(--font-secondary-weight);
+  font-style: var(--font-secondary-style);
 }
 
 /* Features Grid */
