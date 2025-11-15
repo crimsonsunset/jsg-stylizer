@@ -62,11 +62,16 @@ export const SYSTEM_FONTS = [
 
 // Default configuration
 export const DEFAULT_CONFIG = {
-  primaryFont: "Roboto",
-  secondaryFont: "Open Sans",
+  primaryFont: "Changa One",
+  secondaryFont: "Nova Square",
   previewText: "The quick brown fox jumps over the lazy dog",
-  cssVariablePrimary: "--font-primary",
-  cssVariableSecondary: "--font-secondary",
+  // Separate CSS variables for family, weight, and style
+  cssVariablePrimaryFamily: "--font-primary-family",
+  cssVariablePrimaryWeight: "--font-primary-weight",
+  cssVariablePrimaryStyle: "--font-primary-style",
+  cssVariableSecondaryFamily: "--font-secondary-family",
+  cssVariableSecondaryWeight: "--font-secondary-weight",
+  cssVariableSecondaryStyle: "--font-secondary-style",
 };
 
 // Default button configuration

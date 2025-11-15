@@ -1,31 +1,33 @@
 /**
- * Stylizer - Universal Font Picker Web Component
+ * Stylizer - Universal Font Picker
  * 
- * A framework-agnostic Web Component for experimenting with Google Fonts.
+ * A config-driven font picker for experimenting with Google Fonts.
  * Works in vanilla JS, React, Vue, Svelte, Astro, and any other framework.
  * 
  * @example
- * ```html
- * <jsg-stylizer 
- *   is-development="true"
- *   default-primary-font="Roboto"
- *   default-secondary-font="Open Sans">
- * </jsg-stylizer>
+ * ```javascript
+ * import Stylizer from '@jsg/stylizer';
+ * 
+ * Stylizer.configure({
+ *   fonts: { primary: 'Roboto', secondary: 'Open Sans' },
+ *   cssVariables: { primary: '--font-primary', secondary: '--font-secondary' }
+ * });
  * ```
  */
 
-import { StylizerElement } from './Stylizer';
+import { Stylizer } from './Stylizer';
 
-// Register custom element only in browser environment
-if (typeof window !== 'undefined' && typeof customElements !== 'undefined') {
-  if (!customElements.get('jsg-stylizer')) {
-    customElements.define('jsg-stylizer', StylizerElement);
-  }
+// Auto-initialize with defaults if in browser environment
+if (typeof window !== 'undefined') {
+  // Don't await - let it initialize in background
+  Stylizer.configure().catch(error => {
+    console.error('Failed to initialize Stylizer:', error);
+  });
 }
 
-// Export for type safety and direct usage
-export { StylizerElement };
+// Export Stylizer class
+export { Stylizer };
 export * from './types';
 export * from './constants';
-
-
+export * from './config';
+export type { StylizerConfig, ThemeConfig, InternalConfig } from './config';

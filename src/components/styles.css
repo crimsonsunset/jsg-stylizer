@@ -1,0 +1,67 @@
+/**
+ * Sidebar-specific styles for Stylizer
+ * Slide-in animations and collapsed button positioning
+ */
+
+/* Sidebar slide-in animation */
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Sidebar container */
+.stylizer-sidebar {
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+.stylizer-sidebar.closing {
+  animation: slideOutToRight 0.3s ease-in;
+}
+
+/* Collapsed button positioning */
+.stylizer-collapsed-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9998;
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+/* Ensure sidebar appears above page content but below font picker modal */
+.stylizer-sidebar-container {
+  z-index: 9999;
+}
+
+/* Font picker modal should be above sidebar */
+.fpb__modal {
+  z-index: 10000 !important;
+}
+
+/* Body content push animation when sidebar is open */
+body.stylizer-sidebar-open {
+  margin-right: 400px !important;
+  transition: margin-right 0.3s ease-out !important;
+}
+
+body.stylizer-sidebar-closing {
+  margin-right: 0 !important;
+  transition: margin-right 0.3s ease-in !important;
+}
+

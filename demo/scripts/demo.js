@@ -2,71 +2,33 @@
  * Demo site interactivity
  */
 
-// Theme toggle
-const themeToggle = document.getElementById('themeToggle');
-const html = document.documentElement;
-
-themeToggle.addEventListener('click', () => {
-  const currentTheme = html.getAttribute('data-theme');
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', newTheme);
-  localStorage.setItem('theme', newTheme);
-});
-
-// Load saved theme
-const savedTheme = localStorage.getItem('theme') || 'dark';
-html.setAttribute('data-theme', savedTheme);
-
-// Framework tabs
-const tabs = document.querySelectorAll('.tab');
-const tabPanes = document.querySelectorAll('.tab-pane');
-
-tabs.forEach(tab => {
-  tab.addEventListener('click', () => {
-    const targetId = tab.dataset.tab;
-
-    // Update active tab
-    tabs.forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-
-    // Update active pane
-    tabPanes.forEach(pane => {
-      if (pane.id === targetId) {
-        pane.classList.add('active');
-      } else {
-        pane.classList.remove('active');
-      }
-    });
-  });
-});
-
-// Listen to Stylizer font changes
-const stylizer = document.querySelector('jsg-stylizer');
-if (stylizer) {
-  // Configure button via buttonConfig property
-  stylizer.buttonConfig = {
-    preset: 'primary',
-    text: 'Click here to change fonts'
-  };
-  
-  stylizer.addEventListener('font-changed', (e) => {
-    console.log('Font changed:', e.detail);
-    
-    // Update demo text to show the change
-    const { fontType, fontFamily } = e.detail;
-    if (fontType === 'primary') {
-      document.getElementById('demo-primary').textContent = `this is your primary font`;
-    } else {
-      document.getElementById('demo-secondary').textContent = `this is your secondary font`;
-    }
-  });
-  
-  stylizer.addEventListener('font-reset', (e) => {
-    console.log('Fonts reset:', e.detail);
-    document.getElementById('demo-primary').textContent = 'this is your primary font';
-    document.getElementById('demo-secondary').textContent = 'this is your secondary font';
+// Toggle Stylizer sidebar button
+const toggleBtn = document.getElementById('toggle-stylizer-btn');
+if (toggleBtn) {
+  toggleBtn.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('stylizer-sidebar-toggle'));
   });
 }
+
+// Listen to Stylizer font changes via window events
+window.addEventListener('stylizer-font-changed', (e) => {
+  console.log('Font changed:', e.detail);
+  
+  // Update demo text to show the change
+  const { fontType, fontFamily, weight, italic } = e.detail;
+  const italicText = italic ? ' italic' : '';
+  if (fontType === 'primary') {
+    document.getElementById('demo-primary').textContent = `Primary Font: ${fontFamily} | ${weight}${italicText}`;
+  } else {
+    document.getElementById('demo-secondary').textContent = `Secondary Font: ${fontFamily} | ${weight}${italicText}`;
+  }
+});
+
+window.addEventListener('stylizer-font-reset', (e) => {
+  console.log('Fonts reset:', e.detail);
+  document.getElementById('demo-primary').textContent = 'Primary Font: Changa One | 400';
+  document.getElementById('demo-secondary').textContent = 'Secondary Font: Nova Square | 400';
+});
 
 // Smooth scroll for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -97,5 +59,3 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   }
   console.warn('⚠️ JSG Logger not available after initialization. Make sure Stylizer component is loaded.');
 })();
-
-

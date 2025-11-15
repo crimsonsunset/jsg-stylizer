@@ -1,22 +1,14 @@
 /**
  * Global TypeScript declarations for @jsg/stylizer
  * 
- * Provides JSX and DOM API type support for the jsg-stylizer Web Component
+ * Provides type support for Stylizer events
  */
 
-import type { StylizerElement, StylizerAttributes } from './types';
-
-// JSX namespace augmentation for framework support (React, Vue, Astro, etc.)
-declare namespace JSX {
-  interface IntrinsicElements {
-    'jsg-stylizer': StylizerAttributes;
-  }
-}
-
-// DOM API type support
+// Custom event types for Stylizer
 declare global {
-  interface HTMLElementTagNameMap {
-    'jsg-stylizer': StylizerElement;
+  interface WindowEventMap {
+    'stylizer-font-changed': CustomEvent<import('./types').FontChangedEventDetail>;
+    'stylizer-font-reset': CustomEvent<import('./types').FontResetEventDetail>;
   }
 }
 
