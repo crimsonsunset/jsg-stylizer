@@ -35,11 +35,16 @@
   --stylizer-border: var(--color-border-default);
   --stylizer-surface: var(--color-bg-tint2);
   --stylizer-text-secondary: var(--color-text-muted);
-}
-
-/* Base styles */
-:root {
-  /* Default fonts - will be overridden by Stylizer CSS variables */
+  
+  /* Font variables - will be overridden by Stylizer CSS variables */
+  --font-primary-family: "Changa One", sans-serif;
+  --font-primary-weight: 400;
+  --font-primary-style: normal;
+  --font-secondary-family: "Nova Square", sans-serif;
+  --font-secondary-weight: 400;
+  --font-secondary-style: normal;
+  
+  /* Base styles */
   font-family: var(--font-primary-family);
   font-weight: var(--font-primary-weight);
   font-style: var(--font-primary-style);
