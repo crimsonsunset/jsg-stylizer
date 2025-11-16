@@ -7,6 +7,9 @@ VERSION_TYPE=$1
 git add -A
 git commit -m 'chore: prepare for release' || true
 
+# Ensure npm uses the correct registry (not yarn's registry)
+export npm_config_registry=https://registry.npmjs.org/
+
 # Run np with auto-confirm
 echo 'y' | npx np $VERSION_TYPE --no-tests --any-branch --no-release-draft
 
