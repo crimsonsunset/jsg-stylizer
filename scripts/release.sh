@@ -8,7 +8,7 @@ git add -A
 git commit -m 'chore: prepare for release' || true
 
 # Run np with auto-confirm
-echo 'y' | np $VERSION_TYPE --no-tests --any-branch --no-release-draft
+echo 'y' | npx np $VERSION_TYPE --no-tests --any-branch --no-release-draft
 
 # Get the version that was just published from package.json
 VERSION=$(grep '"version"' package.json | sed 's/.*"version": "\(.*\)".*/\1/')
