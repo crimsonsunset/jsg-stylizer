@@ -1,0 +1,27 @@
+{
+  "name": "jsg-stylizer",
+  "description": "Config-driven font picker with DevTools sidebar for experimenting with Google Fonts",
+  "topics": [
+    "font-picker",
+    "google-fonts",
+    "typography",
+    "framework-agnostic",
+    "preact",
+    "devtools",
+    "sidebar",
+    "css-variables",
+    "react",
+    "vue",
+    "svelte",
+    "astro",
+    "javascript",
+    "typescript",
+    "npm-package"
+  ],
+  "website": "https://jsg-stylizer.netlify.app/",
+  "visibility": "public",
+  "has_issues": true,
+  "has_wiki": true,
+  "has_projects": false
+}
+
