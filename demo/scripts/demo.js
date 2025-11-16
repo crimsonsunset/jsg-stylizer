@@ -44,8 +44,8 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   });
 });
 
-// Wait for JSG Logger to be available (async initialization)
-// In v1.5.5+, window.JSG_Logger is automatically exposed when getInstance() is called
+// Check for JSG Logger availability (optional - stylizer works without it)
+// Logger may be provided by consuming app or may not be available
 (async function checkLogger() {
   // Wait up to 2 seconds for logger to initialize
   for (let i = 0; i < 20; i++) {
@@ -57,5 +57,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     }
     await new Promise(resolve => setTimeout(resolve, 100));
   }
-  console.warn('⚠️ JSG Logger not available after initialization. Make sure Stylizer component is loaded.');
+  // Logger is optional - stylizer works fine without it
+  console.log('ℹ️ JSG Logger not available - stylizer will use no-op logger');
 })();

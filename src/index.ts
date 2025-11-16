@@ -23,6 +23,34 @@ if (typeof window !== 'undefined') {
   Stylizer.configure().catch(error => {
     console.error('Failed to initialize Stylizer:', error);
   });
+
+  // Expose Stylizer API globally for browser console access
+  // Similar to window.JSG_Logger pattern
+  (window as any).Stylizer = {
+    // Get singleton instance
+    getInstance: () => Stylizer.getInstance(),
+    
+    // Convenience methods that work on the singleton
+    showSidebar: () => Stylizer.getInstance().showSidebar(),
+    hideSidebar: () => Stylizer.getInstance().hideSidebar(),
+    toggleSidebar: () => Stylizer.getInstance().toggleSidebar(),
+    isSidebarVisible: () => Stylizer.getInstance().isSidebarVisible(),
+    
+    // Font picker methods
+    openFontPicker: (fontType: 'primary' | 'secondary' = 'primary', mode: 'curated' | 'all' = 'curated') => 
+      Stylizer.getInstance().openFontPicker(fontType, mode),
+    
+    // Font management
+    getFonts: () => Stylizer.getInstance().getFonts(),
+    getConfig: () => Stylizer.getInstance().getConfig(),
+    reset: () => Stylizer.getInstance().reset(),
+    
+    // Configure (reconfigure)
+    configure: (config: any) => Stylizer.configure(config),
+    
+    // Destroy instance
+    destroy: () => Stylizer.getInstance().destroy(),
+  };
 }
 
 // Export Stylizer class

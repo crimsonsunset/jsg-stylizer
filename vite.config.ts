@@ -86,7 +86,7 @@ export default defineConfig(({ mode }) => {
             return assetInfo.name || 'asset';
           }
         },
-        external: []
+        external: ['@crimsonsunset/jsg-logger']
       }
     },
     resolve: {
