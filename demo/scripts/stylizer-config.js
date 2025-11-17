@@ -7,8 +7,26 @@ import JSGLogger from '@crimsonsunset/jsg-logger';
 import { Stylizer } from '../../src/index.ts';
 
 // Initialize JSG Logger for demo (optional - stylizer works without it)
-// This sets window.JSG_Logger for console access
-JSGLogger.getInstanceSync();
+// Enable DevTools and set window.JSG_Logger for console access
+// Define webComponents component that stylizer uses for logging
+// Note: components object REPLACES defaults, so include 'core' if you want it
+const loggerInstance = JSGLogger.getInstanceSync({
+  devtools: { enabled: true },
+  components: {
+    core: {
+      emoji: '🎯',
+      color: '#4A90E2',
+      name: 'JSG-CORE',
+      level: 'info'
+    },
+    webComponents: {
+      emoji: '📦',
+      color: '#4A90E2',
+      name: 'WEB-COMPONENTS',
+      level: 'info'
+    }
+  }
+});
 
 // Set API key from environment variable if available
 // Supports both VITE_ prefix (Vite) and PUBLIC_ prefix (Astro)

@@ -20,6 +20,11 @@ export default defineConfig(({ mode }) => {
       plugins: [preact()],
       root: 'demo',
       envDir: resolve(__dirname), // Look for .env in project root, not demo directory
+      server: {
+        fs: {
+          allow: ['..'] // Allow Vite to access parent directories (needed for npm link)
+        }
+      },
       build: {
         outDir: '../demo-dist',
         emptyOutDir: true,
