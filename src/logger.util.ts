@@ -1,10 +1,8 @@
 /**
- * Smart logger utility for Stylizer
+ * Logger utility for Stylizer
  * 
- * Detects existing logger instances and falls back gracefully:
- * 1. Check window.JSG_Logger (set by consuming app)
- * 2. Try dynamic import of jsg-logger (uses consuming app's version if peer dependency)
- * 3. Fall back to no-op logger if unavailable
+ * Uses JSG Logger if available via window.JSG_Logger (set by consuming app),
+ * otherwise falls back to no-op logger.
  */
 
 /**
@@ -28,78 +26,33 @@ const noOpLogger: LoggerInterface = {
 };
 
 /**
- * Track logger detection state for debugging
+ * Get logger component once at module load
+ * Checks window.JSG_Logger if available
  */
-let loggerDetected = false;
-let detectionLogged = false;
+let logger: LoggerInterface | null = null;
 
-/**
- * Get logger component lazily - checks window.JSG_Logger on each access
- * This allows logger to be detected even if it initializes after stylizer loads
- */
-function getLoggerComponent(): LoggerInterface | null {
-  if (typeof window !== 'undefined' && (window as any).JSG_Logger) {
+if (typeof window !== 'undefined') {
+  if ((window as any).JSG_Logger) {
+    console.log('[Stylizer] 🔍 window.JSG_Logger found, attempting to get component...');
     try {
       const component = (window as any).JSG_Logger.getComponent('webComponents');
       if (component && typeof component.debug === 'function') {
-        // Log detection once (first successful access)
-        if (!loggerDetected && !detectionLogged) {
-          loggerDetected = true;
-          detectionLogged = true;
-          console.log('[Stylizer] ✅ Using existing JSG Logger instance from consuming app');
-        }
-        return component;
+        logger = component;
+        console.log('[Stylizer] ✅ Using JSG Logger component from window.JSG_Logger');
+      } else {
+        console.log('[Stylizer] ⚠️ window.JSG_Logger found but getComponent("webComponents") returned invalid component');
       }
     } catch (error) {
-      // Fall through to no-op
+      console.log('[Stylizer] ❌ Error getting logger component:', error);
     }
+  } else {
+    console.log('[Stylizer] ℹ️ window.JSG_Logger not found, using no-op logger');
   }
-  
-  // Log no-op fallback once (first access when logger not available)
-  if (!detectionLogged) {
-    detectionLogged = true;
-    console.log('[Stylizer] ℹ️ JSG Logger not available - using no-op logger (logs will be silent)');
-  }
-  
-  return null;
+} else {
+  console.log('[Stylizer] ℹ️ Not in browser environment, using no-op logger');
 }
 
 /**
- * Create lazy logger proxy that checks window.JSG_Logger on each method call
- * This ensures logger is detected even if it initializes after stylizer loads
+ * Export logger or no-op fallback
  */
-function createLazyLogger(): LoggerInterface {
-  return {
-    debug: (...args: any[]) => {
-      const logger = getLoggerComponent();
-      if (logger) {
-        logger.debug(...args);
-      }
-    },
-    info: (...args: any[]) => {
-      const logger = getLoggerComponent();
-      if (logger) {
-        logger.info(...args);
-      }
-    },
-    warn: (...args: any[]) => {
-      const logger = getLoggerComponent();
-      if (logger) {
-        logger.warn(...args);
-      }
-    },
-    error: (...args: any[]) => {
-      const logger = getLoggerComponent();
-      if (logger) {
-        logger.error(...args);
-      }
-    },
-  };
-}
-
-/**
- * Export lazy logger that checks window.JSG_Logger on each call
- * Uses smart detection: checks window.JSG_Logger first, falls back to no-op
- */
-export const stylizerLogger = createLazyLogger();
-
+export const stylizerLogger = logger || noOpLogger;
