@@ -43,20 +43,3 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     }
   });
 });
-
-// Check for JSG Logger availability (optional - stylizer works without it)
-// Logger may be provided by consuming app or may not be available
-(async function checkLogger() {
-  // Wait up to 2 seconds for logger to initialize
-  for (let i = 0; i < 20; i++) {
-    if (typeof window !== 'undefined' && window.JSG_Logger) {
-      console.log('✅ JSG Logger DevTools available!');
-      console.log('💡 Try: JSG_Logger.enableDevPanel()');
-      console.log('📋 Available methods:', Object.keys(window.JSG_Logger));
-      return;
-    }
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
-  // Logger is optional - stylizer works fine without it
-  console.log('ℹ️ JSG Logger not available - stylizer will use no-op logger');
-})();

@@ -3,7 +3,12 @@
  * Sets up the API key from environment variables
  */
 
+import JSGLogger from '@crimsonsunset/jsg-logger';
 import { Stylizer } from '../../src/index.ts';
+
+// Initialize JSG Logger for demo (optional - stylizer works without it)
+// This sets window.JSG_Logger for console access
+JSGLogger.getInstanceSync();
 
 // Set API key from environment variable if available
 // Supports both VITE_ prefix (Vite) and PUBLIC_ prefix (Astro)
