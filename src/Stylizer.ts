@@ -9,16 +9,9 @@ import { CURATED_FONTS, SYSTEM_FONTS, FONT_PICKER_CONFIG } from './constants';
 import { globalStyles } from './Stylizer.styles';
 import type { StylizerConfig, InternalConfig } from './config';
 import { mergeConfig, validateConfig, defaultConfig } from './config';
-import JSGLogger from '@crimsonsunset/jsg-logger';
+import { stylizerLogger as webComponentsLogger } from './logger.util';
 import { mountSidebar } from './components/Sidebar';
 import 'fontpicker/dist/fontpicker.min.css';
-
-// Initialize logger once at module level
-const loggerInstance = JSGLogger.getInstanceSync({
-  devtools: { enabled: true }
-});
-
-const webComponentsLogger = loggerInstance.getComponent('webComponents');
 
 /**
  * Font state interface with weight and style
@@ -462,6 +455,63 @@ export class Stylizer {
     // Mount new sidebar
     this.sidebarCleanup = mountSidebar(this.config, this.fontState);
     webComponentsLogger.debug('Sidebar mounted');
+  }
+
+  /**
+   * Show the sidebar (expand if collapsed)
+   */
+  public showSidebar(): void {
+    if (typeof window === 'undefined') return;
+    
+    // Check if sidebar is collapsed by checking localStorage
+    const STORAGE_KEY = 'stylizer-sidebar-collapsed';
+    const isCollapsed = localStorage.getItem(STORAGE_KEY) === 'true';
+    
+    if (isCollapsed) {
+      // Toggle to show (if collapsed, toggle opens it)
+      window.dispatchEvent(new Event('stylizer-sidebar-toggle'));
+      webComponentsLogger.debug('Sidebar shown');
+    } else {
+      webComponentsLogger.debug('Sidebar already visible');
+    }
+  }
+
+  /**
+   * Hide the sidebar (collapse if expanded)
+   */
+  public hideSidebar(): void {
+    if (typeof window === 'undefined') return;
+    
+    // Check if sidebar is collapsed by checking localStorage
+    const STORAGE_KEY = 'stylizer-sidebar-collapsed';
+    const isCollapsed = localStorage.getItem(STORAGE_KEY) === 'true';
+    
+    if (!isCollapsed) {
+      // Toggle to hide (if expanded, toggle closes it)
+      window.dispatchEvent(new Event('stylizer-sidebar-toggle'));
+      webComponentsLogger.debug('Sidebar hidden');
+    } else {
+      webComponentsLogger.debug('Sidebar already hidden');
+    }
+  }
+
+  /**
+   * Toggle sidebar visibility
+   */
+  public toggleSidebar(): void {
+    if (typeof window === 'undefined') return;
+    window.dispatchEvent(new Event('stylizer-sidebar-toggle'));
+    webComponentsLogger.debug('Sidebar toggled');
+  }
+
+  /**
+   * Check if sidebar is currently visible
+   */
+  public isSidebarVisible(): boolean {
+    if (typeof window === 'undefined') return false;
+    const STORAGE_KEY = 'stylizer-sidebar-collapsed';
+    const isCollapsed = localStorage.getItem(STORAGE_KEY) === 'true';
+    return !isCollapsed;
   }
 
   /**

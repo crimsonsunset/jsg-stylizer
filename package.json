@@ -1,6 +1,6 @@
 {
   "name": "jsg-stylizer",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Config-driven font picker with DevTools sidebar for experimenting with Google Fonts",
   "type": "module",
   "module": "./dist/index.esm.js",
@@ -30,10 +30,11 @@
     "release:major": "./scripts/release.sh major",
     "release:first": "npm run build && npm publish"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@crimsonsunset/jsg-logger": "^1.7.7"
   },
   "devDependencies": {
+    "@crimsonsunset/jsg-logger": "^1.7.7",
     "@preact/preset-vite": "^2.8.0",
     "@types/lodash.merge": "^4.6.9",
     "@types/node": "^20.10.0",
