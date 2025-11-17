@@ -32,8 +32,8 @@ if (typeof window !== 'undefined') {
     isSidebarVisible: () => Stylizer.getInstance().isSidebarVisible(),
     
     // Font picker methods
-    openFontPicker: (fontType: 'primary' | 'secondary' = 'primary', mode: 'curated' | 'all' = 'curated') => 
-      Stylizer.getInstance().openFontPicker(fontType, mode),
+    openFontPicker: (fontType: string = 'primary', mode: 'curated' | 'all' = 'curated', curatedFonts?: string[]) => 
+      Stylizer.getInstance().openFontPicker(fontType, mode, curatedFonts),
     
     // Font management
     getFonts: () => Stylizer.getInstance().getFonts(),
@@ -53,4 +53,4 @@ export { Stylizer };
 export * from './types';
 export * from './constants';
 export * from './config';
-export type { StylizerConfig, ThemeConfig, InternalConfig } from './config';
+export type { StylizerConfig, ThemeConfig, InternalConfig, FontConfig, InternalFontConfig } from './config';

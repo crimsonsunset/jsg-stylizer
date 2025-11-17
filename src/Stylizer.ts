@@ -15,19 +15,9 @@ import 'fontpicker/dist/fontpicker.min.css';
 
 /**
  * Font state interface with weight and style
+ * Keyed by font config ID
  */
-interface FontState {
-  primary: {
-    family: string;
-    weight: number;
-    italic: boolean;
-  };
-  secondary: {
-    family: string;
-    weight: number;
-    italic: boolean;
-  };
-}
+type FontState = Record<string, FontInfo>;
 
 /**
  * Font picker mode
@@ -40,23 +30,13 @@ type FontMode = 'curated' | 'all';
 export class Stylizer {
   private static instance: Stylizer | null = null;
   private config: InternalConfig = defaultConfig;
-  private fontState: FontState = {
-    primary: {
-      family: defaultConfig.fonts.primary,
-      weight: 400,
-      italic: false,
-    },
-    secondary: {
-      family: defaultConfig.fonts.secondary,
-      weight: 400,
-      italic: false,
-    },
-  };
+  private fontState: FontState = {};
   private fontsInitialized: boolean = false;
   private fontPickerInstance: any = null;
   private buttonRef: HTMLElement | null = null;
   private currentFontType: FontType = 'primary';
   private currentMode: FontMode = 'curated';
+  private currentCuratedFonts: string[] = CURATED_FONTS;
   private globalStyleElement: HTMLStyleElement | null = null;
   private sidebarCleanup: (() => void) | null = null;
 
@@ -86,40 +66,29 @@ export class Stylizer {
     const instance = Stylizer.getInstance();
     instance.config = mergeConfig(config);
     
-    // Calculate new font state
-    const newPrimaryFont: FontInfo = {
-      family: instance.config.fonts.primary,
-      weight: 400,
-      italic: false,
-    };
-    const newSecondaryFont: FontInfo = {
-      family: instance.config.fonts.secondary,
-      weight: 400,
-      italic: false,
-    };
+    // Calculate new font state for all configured fonts
+    const fontPromises: Promise<void>[] = [];
     
-    // Check if fonts actually changed (or if this is first initialization)
-    const primaryChanged = 
-      !instance.fontsInitialized ||
-      instance.fontState.primary.family !== newPrimaryFont.family ||
-      instance.fontState.primary.weight !== newPrimaryFont.weight ||
-      instance.fontState.primary.italic !== newPrimaryFont.italic;
+    for (const fontConfig of instance.config.fonts) {
+      const newFontInfo: FontInfo = {
+        family: fontConfig.font,
+        weight: 400,
+        italic: false,
+      };
+      
+      // Check if font actually changed (or if this is first initialization)
+      const existingFont = instance.fontState[fontConfig.id];
+      const fontChanged = 
+        !instance.fontsInitialized ||
+        !existingFont ||
+        existingFont.family !== newFontInfo.family ||
+        existingFont.weight !== newFontInfo.weight ||
+        existingFont.italic !== newFontInfo.italic;
 
-    const secondaryChanged = 
-      !instance.fontsInitialized ||
-      instance.fontState.secondary.family !== newSecondaryFont.family ||
-      instance.fontState.secondary.weight !== newSecondaryFont.weight ||
-      instance.fontState.secondary.italic !== newSecondaryFont.italic;
-
-    // Only apply fonts that changed
-    const fontPromises = [];
-    if (primaryChanged) {
-      instance.fontState.primary = newPrimaryFont;
-      fontPromises.push(instance.applyFont('primary', newPrimaryFont));
-    }
-    if (secondaryChanged) {
-      instance.fontState.secondary = newSecondaryFont;
-      fontPromises.push(instance.applyFont('secondary', newSecondaryFont));
+      if (fontChanged) {
+        instance.fontState[fontConfig.id] = newFontInfo;
+        fontPromises.push(instance.applyFont(fontConfig.id, newFontInfo));
+      }
     }
 
     if (fontPromises.length > 0) {
@@ -142,7 +111,7 @@ export class Stylizer {
   /**
    * Get current font state
    */
-  public getFonts(): FontState {
+  public getFonts(): Record<string, FontInfo> {
     return { ...this.fontState };
   }
 
@@ -199,7 +168,7 @@ export class Stylizer {
   /**
    * Initialize JSFontPicker
    */
-  public async initializeFontPicker(fontType: FontType = 'primary', mode: FontMode = 'curated'): Promise<void> {
+  public async initializeFontPicker(fontType: FontType = 'primary', mode: FontMode = 'curated', curatedFonts?: string[]): Promise<void> {
     if (!this.buttonRef) {
       this.createHiddenButton();
     }
@@ -220,6 +189,10 @@ export class Stylizer {
       const FontPickerModule = await import('fontpicker/dist/fontpicker.js');
       const FontPicker = FontPickerModule.default;
       
+      // Find font config to get curated fonts
+      const fontConfig = this.config.fonts.find(f => f.id === fontType);
+      const fontsToUse = curatedFonts ?? fontConfig?.curatedFonts ?? CURATED_FONTS;
+      
       // Configure based on mode
       const config: any = {
         ...FONT_PICKER_CONFIG,
@@ -229,7 +202,7 @@ export class Stylizer {
       };
       
       if (mode === 'curated') {
-        config.googleFonts = CURATED_FONTS;
+        config.googleFonts = fontsToUse;
       } else {
         const apiKey = this.config.googleApiKey;
         if (!apiKey) {
@@ -266,11 +239,12 @@ export class Stylizer {
       this.fontPickerInstance = picker;
       this.currentFontType = fontType;
       this.currentMode = mode;
+      this.currentCuratedFonts = fontsToUse;
       
       webComponentsLogger.info('Picker initialized', {
         mode,
         fontType,
-        fontCount: mode === 'curated' ? CURATED_FONTS.length : 'all'
+        fontCount: mode === 'curated' ? fontsToUse.length : 'all'
       });
     } catch (error) {
       webComponentsLogger.error('Failed to initialize FontPicker', error);
@@ -313,15 +287,22 @@ export class Stylizer {
   /**
    * Open font picker
    */
-  public async openFontPicker(fontType: FontType = 'primary', mode: FontMode = 'curated'): Promise<void> {
-    // If same mode and type, just open existing picker
-    if (this.fontPickerInstance && this.currentFontType === fontType && this.currentMode === mode) {
+  public async openFontPicker(fontType: FontType = 'primary', mode: FontMode = 'curated', curatedFonts?: string[]): Promise<void> {
+    // Find font config to get curated fonts
+    const fontConfig = this.config.fonts.find(f => f.id === fontType);
+    const fontsToUse = curatedFonts ?? fontConfig?.curatedFonts ?? CURATED_FONTS;
+    
+    // If same mode, type, and curated fonts, just open existing picker
+    if (this.fontPickerInstance && 
+        this.currentFontType === fontType && 
+        this.currentMode === mode &&
+        (mode === 'all' || JSON.stringify(this.currentCuratedFonts) === JSON.stringify(fontsToUse))) {
       await this.waitForPickerOpen();
       return;
     }
     
     // Otherwise, initialize with new settings
-    await this.initializeFontPicker(fontType, mode);
+    await this.initializeFontPicker(fontType, mode, fontsToUse);
     
     // Open the picker and wait for 'opened' event
     await this.waitForPickerOpen();
@@ -364,12 +345,17 @@ export class Stylizer {
   private async applyFont(fontType: FontType, fontInfo: FontInfo): Promise<void> {
     if (typeof document === 'undefined') return;
     
+    // Find font config
+    const fontConfig = this.config.fonts.find(f => f.id === fontType);
+    if (!fontConfig) {
+      webComponentsLogger.warn('Font config not found', { fontType });
+      return;
+    }
+    
     // Load Google Font if needed
     await this.loadGoogleFont(fontInfo.family);
     
-    const cssVars = fontType === 'primary' 
-      ? this.config.cssVariables.primary 
-      : this.config.cssVariables.secondary;
+    const cssVars = fontConfig.cssVariables;
     
     // Build CSS values
     const fontFamilyValue = `"${fontInfo.family}", sans-serif`;
@@ -382,19 +368,11 @@ export class Stylizer {
     document.documentElement.style.setProperty(cssVars.style, fontStyleValue);
     
     // Update state with full font information
-    if (fontType === 'primary') {
-      this.fontState.primary = {
-        family: fontInfo.family,
-        weight: fontInfo.weight,
-        italic: fontInfo.italic,
-      };
-    } else {
-      this.fontState.secondary = {
-        family: fontInfo.family,
-        weight: fontInfo.weight,
-        italic: fontInfo.italic,
-      };
-    }
+    this.fontState[fontType] = {
+      family: fontInfo.family,
+      weight: fontInfo.weight,
+      italic: fontInfo.italic,
+    };
     
     webComponentsLogger.info('Font applied', {
       fontType,
@@ -424,42 +402,37 @@ export class Stylizer {
    * Reset fonts to defaults
    */
   public async reset(): Promise<void> {
-    const primaryFontInfo: FontInfo = {
-      family: this.config.fonts.primary,
-      weight: 400,
-      italic: false,
-    };
-    const secondaryFontInfo: FontInfo = {
-      family: this.config.fonts.secondary,
-      weight: 400,
-      italic: false,
-    };
+    const fontInfos: FontInfo[] = [];
+    const resetFonts: Record<string, string> = {};
     
-    // Update CSS variables
-    await Promise.all([
-      this.applyFont('primary', primaryFontInfo),
-      this.applyFont('secondary', secondaryFontInfo)
-    ]);
+    // Reset all configured fonts
+    for (const fontConfig of this.config.fonts) {
+      const fontInfo: FontInfo = {
+        family: fontConfig.font,
+        weight: 400,
+        italic: false,
+      };
+      fontInfos.push(fontInfo);
+      resetFonts[fontConfig.id] = fontConfig.font;
+      await this.applyFont(fontConfig.id, fontInfo);
+    }
     
     // Update picker display if it exists
     if (this.fontPickerInstance) {
-      const defaultFont = this.currentFontType === 'primary' 
-        ? primaryFontInfo.family 
-        : secondaryFontInfo.family;
-      this.fontPickerInstance.setFont(defaultFont);
+      const currentFontConfig = this.config.fonts.find(f => f.id === this.currentFontType);
+      const defaultFont = currentFontConfig?.font ?? fontInfos[0]?.family;
+      if (defaultFont) {
+        this.fontPickerInstance.setFont(defaultFont);
+      }
     }
     
-    webComponentsLogger.info('Fonts reset', {
-      primaryFont: primaryFontInfo.family,
-      secondaryFont: secondaryFontInfo.family
-    });
+    webComponentsLogger.info('Fonts reset', resetFonts);
     
     // Emit reset event
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent<FontResetEventDetail>('stylizer-font-reset', {
         detail: {
-          primaryFont: primaryFontInfo.family,
-          secondaryFont: secondaryFontInfo.family
+          fonts: resetFonts
         },
         bubbles: true,
         composed: true

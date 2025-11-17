@@ -11,13 +11,15 @@ interface FontSectionProps {
   weight?: string;
   numeric?: number;
   mode: FontMode;
-  onSelectFont: (fontType: FontType, mode: FontMode) => void;
+  onSelectFont: (fontType: FontType, mode: FontMode, curatedFonts?: string[]) => void;
   onModeChange?: (mode: FontMode) => void;
   hasApiKey: boolean;
+  curatedFonts?: string[];
+  label?: string;
 }
 
 /**
- * Font section component for primary or secondary font selection
+ * Font section component for font selection
  */
 export function FontSection({
   fontType,
@@ -26,9 +28,11 @@ export function FontSection({
   numeric,
   mode,
   onSelectFont,
-  hasApiKey
+  hasApiKey,
+  curatedFonts,
+  label: propLabel
 }: FontSectionProps) {
-  const label = fontType === 'primary' ? 'Primary Font' : 'Secondary Font';
+  const label = propLabel ?? (fontType === 'primary' ? 'Primary Font' : fontType === 'secondary' ? 'Secondary Font' : fontType);
 
   return (
     <Pane paddingX={16} paddingY={12} borderBottom="muted">
@@ -39,14 +43,14 @@ export function FontSection({
       <Pane display="flex" flexDirection="row" gap={8}>
         <Button
           appearance="primary"
-          onClick={() => onSelectFont(fontType, 'curated')}
+          onClick={() => onSelectFont(fontType, 'curated', curatedFonts)}
           flex={1}
         >
           Browse Curated Font List
         </Button>
         <Button
           appearance="primary"
-          onClick={() => onSelectFont(fontType, 'all')}
+          onClick={() => onSelectFont(fontType, 'all', curatedFonts)}
           flex={1}
           disabled={!hasApiKey}
           title={!hasApiKey ? 'Browse All mode requires Google Fonts API key' : ''}

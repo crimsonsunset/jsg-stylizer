@@ -3,7 +3,7 @@
  */
 
 export type FontMode = 'curated' | 'all';
-export type FontType = 'primary' | 'secondary';
+export type FontType = string; // Font config ID (e.g., 'primary', 'secondary', 'heading', etc.)
 
 /**
  * Font information with weight and style
@@ -15,7 +15,7 @@ export interface FontInfo {
 }
 
 export interface FontChangedEventDetail {
-  fontType: FontType;
+  fontType: string; // Font config ID
   fontFamily: string;
   weight: number;
   italic: boolean;
@@ -27,8 +27,7 @@ export interface FontChangedEventDetail {
 }
 
 export interface FontResetEventDetail {
-  primaryFont: string;
-  secondaryFont: string;
+  fonts: Record<string, string>; // Map of font config ID to font family
 }
 
 

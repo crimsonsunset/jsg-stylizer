@@ -11,17 +11,14 @@ import { CollapsedButton } from './CollapsedButton';
 import { FontSection } from './FontSection';
 import { ThemePreview } from './ThemePreview';
 import { Stylizer } from '../Stylizer';
-import type { FontType, FontMode, FontInfo } from '../types';
+import type { FontType, FontMode, FontInfo, FontChangedEventDetail } from '../types';
 import type { InternalConfig } from '../config';
 import { darkTheme } from './theme';
 import './styles.css';
 
 interface SidebarProps {
   config: InternalConfig;
-  initialFonts: {
-    primary: FontInfo;
-    secondary: FontInfo;
-  };
+  initialFonts: Record<string, FontInfo>;
 }
 
 const STORAGE_KEY = 'stylizer-sidebar-collapsed';
@@ -40,7 +37,7 @@ function Sidebar({ config, initialFonts }: SidebarProps) {
 
   // Listen to font change events
   useEffect(() => {
-    const handleFontChange = (event: CustomEvent) => {
+    const handleFontChange = (event: CustomEvent<FontChangedEventDetail>) => {
       const detail = event.detail;
       setFonts(prev => ({
         ...prev,
@@ -110,9 +107,9 @@ function Sidebar({ config, initialFonts }: SidebarProps) {
     setIsCollapsed(false);
   };
 
-  const handleSelectFont = (fontType: FontType, mode: FontMode) => {
+  const handleSelectFont = (fontType: FontType, mode: FontMode, curatedFonts?: string[]) => {
     const instance = Stylizer.getInstance();
-    instance.openFontPicker(fontType, mode);
+    instance.openFontPicker(fontType, mode, curatedFonts);
   };
 
   const hasApiKey = !!config.googleApiKey;
@@ -140,7 +137,7 @@ function Sidebar({ config, initialFonts }: SidebarProps) {
 
 interface SidebarContentProps {
   config: InternalConfig;
-  fonts: { primary: FontInfo; secondary: FontInfo };
+  fonts: Record<string, FontInfo>;
   onClose: () => void;
   onSelectFont: (fontType: FontType, mode: FontMode) => void;
   hasApiKey: boolean;
@@ -177,25 +174,25 @@ function SidebarContent({
       <SidebarHeader onClose={onClose} />
       
       <Pane flex={1} overflowY="auto" display="flex" flexDirection="column">
-        <FontSection
-          fontType="primary"
-          fontFamily={fonts.primary.family}
-          weight={fonts.primary.italic ? 'italic' : 'normal'}
-          numeric={fonts.primary.weight}
-          mode="curated"
-          onSelectFont={onSelectFont}
-          hasApiKey={hasApiKey}
-        />
-        
-        <FontSection
-          fontType="secondary"
-          fontFamily={fonts.secondary.family}
-          weight={fonts.secondary.italic ? 'italic' : 'normal'}
-          numeric={fonts.secondary.weight}
-          mode="curated"
-          onSelectFont={onSelectFont}
-          hasApiKey={hasApiKey}
-        />
+        {config.fonts.map((fontConfig) => {
+          const fontInfo = fonts[fontConfig.id];
+          if (!fontInfo) return null;
+          
+          return (
+            <FontSection
+              key={fontConfig.id}
+              fontType={fontConfig.id}
+              fontFamily={fontInfo.family}
+              weight={fontInfo.italic ? 'italic' : 'normal'}
+              numeric={fontInfo.weight}
+              mode="curated"
+              onSelectFont={onSelectFont}
+              hasApiKey={hasApiKey}
+              curatedFonts={fontConfig.curatedFonts}
+              label={fontConfig.label}
+            />
+          );
+        })}
       </Pane>
       
       <ThemePreview config={config} fonts={fonts} />
@@ -206,7 +203,7 @@ function SidebarContent({
 /**
  * Mount sidebar to DOM
  */
-export function mountSidebar(config: InternalConfig, initialFonts: { primary: FontInfo; secondary: FontInfo }): () => void {
+export function mountSidebar(config: InternalConfig, initialFonts: Record<string, FontInfo>): () => void {
   const container = document.createElement('div');
   container.id = 'stylizer-sidebar-root';
   document.body.appendChild(container);
