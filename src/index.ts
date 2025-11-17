@@ -17,15 +17,10 @@
 
 import { Stylizer } from './Stylizer';
 
-// Auto-initialize with defaults if in browser environment
+// Expose Stylizer API globally for browser console access
+// Note: Explicit initialization required via Stylizer.configure()
+// Similar to window.JSG_Logger pattern
 if (typeof window !== 'undefined') {
-  // Don't await - let it initialize in background
-  Stylizer.configure().catch(error => {
-    console.error('Failed to initialize Stylizer:', error);
-  });
-
-  // Expose Stylizer API globally for browser console access
-  // Similar to window.JSG_Logger pattern
   (window as any).Stylizer = {
     // Get singleton instance
     getInstance: () => Stylizer.getInstance(),

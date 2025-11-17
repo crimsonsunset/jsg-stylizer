@@ -52,6 +52,7 @@ export class Stylizer {
       italic: false,
     },
   };
+  private fontsInitialized: boolean = false;
   private fontPickerInstance: any = null;
   private buttonRef: HTMLElement | null = null;
   private currentFontType: FontType = 'primary';
@@ -85,32 +86,56 @@ export class Stylizer {
     const instance = Stylizer.getInstance();
     instance.config = mergeConfig(config);
     
-    // Update font state with new defaults
-    instance.fontState = {
-      primary: {
-        family: instance.config.fonts.primary,
-        weight: 400,
-        italic: false,
-      },
-      secondary: {
-        family: instance.config.fonts.secondary,
-        weight: 400,
-        italic: false,
-      },
+    // Calculate new font state
+    const newPrimaryFont: FontInfo = {
+      family: instance.config.fonts.primary,
+      weight: 400,
+      italic: false,
+    };
+    const newSecondaryFont: FontInfo = {
+      family: instance.config.fonts.secondary,
+      weight: 400,
+      italic: false,
     };
     
-    // Apply fonts to CSS variables
-    await Promise.all([
-      instance.applyFont('primary', instance.fontState.primary),
-      instance.applyFont('secondary', instance.fontState.secondary)
-    ]);
+    // Check if fonts actually changed (or if this is first initialization)
+    const primaryChanged = 
+      !instance.fontsInitialized ||
+      instance.fontState.primary.family !== newPrimaryFont.family ||
+      instance.fontState.primary.weight !== newPrimaryFont.weight ||
+      instance.fontState.primary.italic !== newPrimaryFont.italic;
+
+    const secondaryChanged = 
+      !instance.fontsInitialized ||
+      instance.fontState.secondary.family !== newSecondaryFont.family ||
+      instance.fontState.secondary.weight !== newSecondaryFont.weight ||
+      instance.fontState.secondary.italic !== newSecondaryFont.italic;
+
+    // Only apply fonts that changed
+    const fontPromises = [];
+    if (primaryChanged) {
+      instance.fontState.primary = newPrimaryFont;
+      fontPromises.push(instance.applyFont('primary', newPrimaryFont));
+    }
+    if (secondaryChanged) {
+      instance.fontState.secondary = newSecondaryFont;
+      fontPromises.push(instance.applyFont('secondary', newSecondaryFont));
+    }
+
+    if (fontPromises.length > 0) {
+      await Promise.all(fontPromises);
+      instance.fontsInitialized = true;
+      webComponentsLogger.info('Stylizer configured', instance.config);
+    } else {
+      // Silent reconfiguration if nothing changed
+      webComponentsLogger.debug('Stylizer reconfigured (no font changes)', instance.config);
+    }
     
     // Mount sidebar if in browser environment
     if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       instance.mountSidebar();
     }
     
-    webComponentsLogger.info('Stylizer configured', instance.config);
     return instance;
   }
 

@@ -35,12 +35,6 @@ async function configureStylizer() {
   // Check for VITE_ prefix first (Vite convention), then PUBLIC_ (Astro convention)
   const apiKey = import.meta.env.VITE_GOOGLE_FONTS_API_KEY || import.meta.env.PUBLIC_GOOGLE_FONTS_API_KEY;
   
-  console.log('API Key check:', {
-    'VITE_GOOGLE_FONTS_API_KEY': import.meta.env.VITE_GOOGLE_FONTS_API_KEY,
-    'PUBLIC_GOOGLE_FONTS_API_KEY': import.meta.env.PUBLIC_GOOGLE_FONTS_API_KEY,
-    'found': !!apiKey
-  });
-  
   // Configure Stylizer with API key and CSS variables
   // Using new separate CSS variables format
   const config = {
