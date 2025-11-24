@@ -1,6 +1,6 @@
 {
   "name": "jsg-stylizer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Config-driven font picker with DevTools sidebar for experimenting with Google Fonts",
   "type": "module",
   "module": "./dist/index.esm.js",
