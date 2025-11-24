@@ -166,6 +166,176 @@ export class Stylizer {
   }
 
   /**
+   * Monkey patch FontPicker to add 'select' event when font is selected in modal
+   */
+  private patchFontPickerSelectEvent(picker: any): void {
+    const originalOpen = picker.open.bind(picker);
+    let selectListeners: Array<() => void> = [];
+
+    picker.open = async function() {
+      console.log('[Stylizer] 🚀 Patched picker.open() called');
+      let result;
+      try {
+        // Call original open - don't await, just call it
+        console.log('[Stylizer] 📞 Calling originalOpen()...');
+        const openResult = originalOpen();
+        console.log('[Stylizer] 📞 originalOpen() returned:', typeof openResult, openResult);
+        result = openResult;
+        
+        // Don't await - FontPicker's open() might not resolve properly
+        // Instead, we'll wait for DOM to be ready
+      } catch (error) {
+        console.error('[Stylizer] ❌ Error calling originalOpen:', error);
+        result = undefined;
+      }
+      
+      // Wait for dialog to fully open using MutationObserver
+      console.log('[Stylizer] ⏳ Waiting for fonts container to appear...');
+      let fontsContainer = document.querySelector('#fp__fonts');
+
+      // Find font container and variant panel (re-query to be sure)
+      fontsContainer = document.querySelector('#fp__fonts');
+      const variantsPanel = document.querySelector('#fp__variants');
+
+      console.log('[Stylizer] ✅ FontPicker patch: Container found, attaching listeners');
+
+      // Helper to get current variant from DOM
+      const getCurrentVariant = (): { weight: number; italic: boolean } => {
+        const weightInput = variantsPanel?.querySelector<HTMLInputElement>('[name=fp__weight]:checked');
+        const italicInput = variantsPanel?.querySelector<HTMLInputElement>('#fp__italic');
+        
+        return {
+          weight: weightInput ? parseInt(weightInput.value) : 400,
+          italic: italicInput?.checked || false
+        };
+      };
+
+      // Helper to create font object from family name and variant
+      const createFontObject = (familyName: string): any => {
+        try {
+          const family = picker.getFamily(familyName);
+          const variant = getCurrentVariant();
+          
+          return {
+            family: {
+              name: familyName,
+              toString: () => familyName
+            },
+            weight: variant.weight,
+            italic: variant.italic,
+            style: variant.italic ? 'italic' : 'normal',
+            variant: `${variant.weight}${variant.italic ? 'i' : ''}`
+          };
+        } catch (error) {
+          webComponentsLogger.error('Failed to create font object for select event', { familyName, error });
+          console.error('[Stylizer] Failed to create font object for select event', { familyName, error });
+          return null;
+        }
+      };
+
+      // Emit select event with current font info
+      const emitSelectEvent = () => {
+        console.log('[Stylizer] 🔍 emitSelectEvent called');
+        
+        // Try multiple ways to find selected font
+        const selectedElement = fontsContainer.querySelector('.fp__selected[data-family]') as HTMLElement;
+        console.log('[Stylizer] Selected element (via .fp__selected):', selectedElement?.getAttribute('data-family') || 'not found');
+        
+        // Fallback: find any element with fp__selected class
+        if (!selectedElement) {
+          const anySelected = fontsContainer.querySelector('.fp__selected');
+          console.log('[Stylizer] Any selected element:', anySelected?.getAttribute('data-family') || 'not found');
+        }
+
+        
+        const familyName = selectedElement.getAttribute('data-family');
+        if (!familyName) {
+          console.log('[Stylizer] ⚠️ Selected element has no data-family attribute');
+          return;
+        }
+        
+        console.log('[Stylizer] 📦 Creating font object for:', familyName);
+        const font = createFontObject(familyName);
+        if (font) {
+          console.log('[Stylizer] ✅ Emitting select event', { family: familyName, weight: font.weight, italic: font.italic });
+          webComponentsLogger.debug('Emitting select event', { family: familyName, weight: font.weight, italic: font.italic });
+          picker.emit('select', font);
+        } else {
+          console.log('[Stylizer] ❌ Failed to create font object');
+        }
+      };
+
+      // Listen for font clicks
+      const onFontClick = (event: Event) => {
+        const mouseEvent = event as MouseEvent;
+        console.log('[Stylizer] 🖱️ Font click detected', { target: (mouseEvent.target as HTMLElement)?.tagName });
+        
+        const target = mouseEvent.target as HTMLElement;
+        
+        // Skip if clicking heart icon or anything inside it (e.g., SVG)
+        if (target.closest('.fp__heart')) {
+          console.log('[Stylizer] ⏭️ Skipping heart icon click');
+          return;
+        }
+        
+        const fontElement = target.closest('[data-family]') as HTMLElement;
+        const clickedFamily = fontElement.getAttribute('data-family');
+        console.log('[Stylizer] 📝 Font clicked:', clickedFamily);
+        
+        // Small delay to let the picker update its internal state and DOM
+        setTimeout(() => {
+          console.log('[Stylizer] ⏰ setTimeout callback executing for font:', clickedFamily);
+          emitSelectEvent();
+        }, 10);
+      };
+
+      // Listen for variant changes (weight/italic)
+      const onVariantChange = () => {
+        console.log('[Stylizer] 🔄 Variant change detected');
+        setTimeout(() => {
+          emitSelectEvent();
+        }, 0);
+      };
+
+      fontsContainer.addEventListener('click', onFontClick, true); // Use capture phase to catch before FontPicker
+      selectListeners.push(() => fontsContainer.removeEventListener('click', onFontClick, true));
+      console.log('[Stylizer] ✅ Click listener attached to fonts container (capture phase)');
+      
+      if (variantsPanel) {
+        variantsPanel.addEventListener('input', onVariantChange);
+        selectListeners.push(() => variantsPanel.removeEventListener('input', onVariantChange));
+        console.log('[Stylizer] ✅ Input listener attached to variants panel');
+      } else {
+        console.log('[Stylizer] ⚠️ Variants panel not found');
+      }
+
+      // Cleanup on close - check if modal is actually closing
+      const listenersAttachedAt = Date.now();
+      const onClose = () => {
+        // Prevent cleanup if it happens too quickly after attaching (likely a false close event)
+        const timeSinceAttach = Date.now() - listenersAttachedAt;
+        const modalStillOpen = document.querySelector('.fpb__modal') !== null;
+        
+        // Only cleanup if modal is actually closed AND enough time has passed
+        if (!modalStillOpen && timeSinceAttach > 200) {
+          console.log('[Stylizer] 🧹 Cleaning up select event listeners', { timeSinceAttach, modalStillOpen });
+          selectListeners.forEach(cleanup => cleanup());
+          selectListeners = [];
+          picker.off('close', onClose);
+          picker.off('closed', onClose);
+        } else {
+          console.log('[Stylizer] ⚠️ Close event fired but conditions not met, ignoring cleanup', { timeSinceAttach, modalStillOpen });
+        }
+      };
+      
+      picker.once('close', onClose);
+      picker.once('closed', onClose);
+      
+      return result;
+    };
+  }
+
+  /**
    * Initialize JSFontPicker
    */
   public async initializeFontPicker(fontType: FontType = 'primary', mode: FontMode = 'curated', curatedFonts?: string[]): Promise<void> {
@@ -219,6 +389,9 @@ export class Stylizer {
       if (!picker) {
         throw new Error('Failed to create JSFontPicker instance');
       }
+      
+      // Monkey patch to add 'select' event
+      this.patchFontPickerSelectEvent(picker);
       
       // Listen for font selection
       (picker as any).on('pick', (font: any) => {
