@@ -200,6 +200,11 @@ export class Stylizer {
       fontsContainer = document.querySelector('#fp__fonts');
       const variantsPanel = document.querySelector('#fp__variants');
 
+      if (!fontsContainer) {
+        console.error('[Stylizer] ❌ Fonts container not found');
+        return;
+      }
+
       console.log('[Stylizer] ✅ FontPicker patch: Container found, attaching listeners');
 
       // Helper to get current variant from DOM
@@ -238,6 +243,8 @@ export class Stylizer {
 
       // Emit select event with current font info
       const emitSelectEvent = () => {
+        if (!fontsContainer) return;
+        
         console.log('[Stylizer] 🔍 emitSelectEvent called');
         
         // Try multiple ways to find selected font
@@ -301,7 +308,11 @@ export class Stylizer {
       };
 
       fontsContainer.addEventListener('click', onFontClick, true); // Use capture phase to catch before FontPicker
-      selectListeners.push(() => fontsContainer.removeEventListener('click', onFontClick, true));
+      selectListeners.push(() => {
+        if (fontsContainer) {
+          fontsContainer.removeEventListener('click', onFontClick, true);
+        }
+      });
       console.log('[Stylizer] ✅ Click listener attached to fonts container (capture phase)');
       
       if (variantsPanel) {
