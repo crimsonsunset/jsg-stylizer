@@ -17,6 +17,7 @@ A framework-agnostic font picker that lets you quickly experiment with different
 - 🎭 **Font Variants** - Select font weights (100-900) and italic styles
 - 🌓 **Theme Integration** - Automatic light/dark mode support via CSS variables
 - 🛠️ **DevTools Sidebar** - Slide-in panel for easy font selection
+- 👁️ **Live Preview** - See font changes in real-time as you browse (optional, with cancel/revert)
 - 📦 **Tiny Bundle** - Lightweight with minimal dependencies
 - 🚀 **Zero Config** - Works out of the box with sensible defaults
 
@@ -308,6 +309,7 @@ Stylizer.configure({
   };
   googleApiKey?: string;  // Required for Browse All mode
   previewText?: string;    // Default: "The quick brown fox jumps over the lazy dog"
+  livePreview?: boolean;   // Default: false - Apply fonts immediately as user browses (reverts on cancel)
 });
 ```
 
@@ -409,9 +411,26 @@ Stylizer includes a DevTools sidebar that slides in from the right side of the s
 - **Collapsible** - Click the X button to collapse to a small button in the top-right corner
 - **Persistent state** - Collapsed/expanded state persists across page reloads
 - **Font selection** - Click buttons to open font picker modal
-- **Live preview** - See font changes in real-time
+- **Live preview** - See font changes in real-time (when `livePreview: true` is enabled)
 
 The sidebar is automatically mounted when you call `Stylizer.configure()`. It provides an easy way to experiment with fonts during development.
+
+### Live Preview Mode
+
+When `livePreview: true` is enabled in your config, fonts are applied immediately as you browse the font picker, before clicking the select button. This provides instant visual feedback:
+
+```typescript
+Stylizer.configure({
+  livePreview: true,  // Enable real-time font changes
+  // ... other config
+});
+```
+
+**Behavior**:
+- ✅ Fonts change in real-time as you click different fonts or adjust weight/italic
+- ✅ If you close the picker without clicking select, fonts revert to the original state
+- ✅ If you click select, the changes are confirmed and kept
+- ✅ Default behavior (`livePreview: false`) only applies fonts when select button is clicked
 
 ## 🔑 Google Fonts API Key
 

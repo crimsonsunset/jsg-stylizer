@@ -173,6 +173,7 @@ export class Stylizer {
   private patchFontPickerSelectEvent(picker: any): void {
     const originalOpen = picker.open.bind(picker);
     let selectListeners: Array<() => void> = [];
+    const stylizerInstance = this; // Capture Stylizer instance for use in closures
 
     picker.open = async function() {
       console.log('[Stylizer] 🚀 Patched picker.open() called');
@@ -313,37 +314,74 @@ export class Stylizer {
 
       // Cleanup on close - check if modal is actually closing
       const listenersAttachedAt = Date.now();
-      const onClose = () => {
-        // Prevent cleanup if it happens too quickly after attaching (likely a false close event)
-        const timeSinceAttach = Date.now() - listenersAttachedAt;
-        const modalStillOpen = document.querySelector('.fpb__modal') !== null;
-        
-        // Only cleanup if modal is actually closed AND enough time has passed
-        if (!modalStillOpen && timeSinceAttach > 200) {
-          // Revert font if livePreview was enabled and pick was not confirmed
-          if (this.config.livePreview && !this.pickConfirmed && this.originalFontState) {
-            const fontTypeToRevert = this.currentFontType;
-            this.applyFont(fontTypeToRevert, this.originalFontState).catch((error: unknown) => {
-              webComponentsLogger.error('Failed to revert font on cancel', { fontType: fontTypeToRevert, error });
-            });
-          }
-          
-          // Clean up state
-          this.originalFontState = null;
-          this.pickConfirmed = false;
-          
-          console.log('[Stylizer] 🧹 Cleaning up select event listeners', { timeSinceAttach, modalStillOpen });
-          selectListeners.forEach(cleanup => cleanup());
-          selectListeners = [];
-          picker.off('close', onClose);
-          picker.off('closed', onClose);
-        } else {
-          console.log('[Stylizer] ⚠️ Close event fired but conditions not met, ignoring cleanup', { timeSinceAttach, modalStillOpen });
+      let closeHandled = false;
+      
+      const handleClose = () => {
+        // Prevent duplicate handling
+        if (closeHandled) {
+          return;
         }
+        
+        const timeSinceAttach = Date.now() - listenersAttachedAt;
+        
+        // Wait a bit for DOM to update, then check if modal is actually gone
+        setTimeout(() => {
+          const modalStillOpen = document.querySelector('.fpb__modal') !== null;
+          
+          console.log('[Stylizer] 🔚 Close event processed', { 
+            timeSinceAttach, 
+            modalStillOpen, 
+            livePreview: stylizerInstance.config.livePreview,
+            pickConfirmed: stylizerInstance.pickConfirmed,
+            hasOriginalState: !!stylizerInstance.originalFontState
+          });
+          
+          // Only cleanup if modal is actually closed AND enough time has passed
+          if (!modalStillOpen && timeSinceAttach > 200) {
+            closeHandled = true;
+            
+            // Revert font if livePreview was enabled and pick was not confirmed
+            if (stylizerInstance.config.livePreview && !stylizerInstance.pickConfirmed && stylizerInstance.originalFontState) {
+              const fontTypeToRevert = stylizerInstance.currentFontType;
+              console.log('[Stylizer] 🔄 Reverting font on cancel', { 
+                fontType: fontTypeToRevert, 
+                originalFont: stylizerInstance.originalFontState,
+                pickConfirmed: stylizerInstance.pickConfirmed 
+              });
+              stylizerInstance.applyFont(fontTypeToRevert, stylizerInstance.originalFontState).catch((error: unknown) => {
+                webComponentsLogger.error('Failed to revert font on cancel', { fontType: fontTypeToRevert, error });
+              });
+            } else {
+              console.log('[Stylizer] ⏭️ Skipping revert', {
+                livePreview: stylizerInstance.config.livePreview,
+                pickConfirmed: stylizerInstance.pickConfirmed,
+                hasOriginalState: !!stylizerInstance.originalFontState
+              });
+            }
+            
+            // Clean up state
+            stylizerInstance.originalFontState = null;
+            stylizerInstance.pickConfirmed = false;
+            
+            console.log('[Stylizer] 🧹 Cleaning up select event listeners');
+            selectListeners.forEach(cleanup => cleanup());
+            selectListeners = [];
+            picker.off('close', handleClose);
+            picker.off('closed', handleClose);
+          } else if (modalStillOpen) {
+            // Modal still open, try again after a longer delay
+            setTimeout(() => {
+              const stillOpen = document.querySelector('.fpb__modal') !== null;
+              if (!stillOpen && !closeHandled) {
+                handleClose();
+              }
+            }, 100);
+          }
+        }, 50);
       };
       
-      picker.once('close', onClose);
-      picker.once('closed', onClose);
+      picker.once('close', handleClose);
+      picker.once('closed', handleClose);
       
       return result;
     };

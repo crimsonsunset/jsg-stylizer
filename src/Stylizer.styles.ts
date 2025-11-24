@@ -23,6 +23,15 @@ export const globalStyles = `
     background-color: var(--stylizer-surface, var(--surface, #ffffff)) !important;
     border-color: var(--stylizer-border, var(--border, #e5e7eb)) !important;
     color: var(--stylizer-text, var(--text, #000000)) !important;
+    
+    /* Position modal on right side */
+    position: fixed !important;
+    top: 00px !important;
+    right: 00px !important;
+    left: auto !important;
+    transform: none !important;
+    margin: 0 !important;
+    height: calc(100vh - 190px) !important;
   }
   
   /* Override #fp__fonts to use dark background */
