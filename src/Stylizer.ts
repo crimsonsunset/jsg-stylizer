@@ -39,6 +39,8 @@ export class Stylizer {
   private currentCuratedFonts: string[] = CURATED_FONTS;
   private globalStyleElement: HTMLStyleElement | null = null;
   private sidebarCleanup: (() => void) | null = null;
+  private originalFontState: FontInfo | null = null;
+  private pickConfirmed: boolean = false;
 
   /**
    * Private constructor for singleton pattern
@@ -318,6 +320,18 @@ export class Stylizer {
         
         // Only cleanup if modal is actually closed AND enough time has passed
         if (!modalStillOpen && timeSinceAttach > 200) {
+          // Revert font if livePreview was enabled and pick was not confirmed
+          if (this.config.livePreview && !this.pickConfirmed && this.originalFontState) {
+            const fontTypeToRevert = this.currentFontType;
+            this.applyFont(fontTypeToRevert, this.originalFontState).catch((error: unknown) => {
+              webComponentsLogger.error('Failed to revert font on cancel', { fontType: fontTypeToRevert, error });
+            });
+          }
+          
+          // Clean up state
+          this.originalFontState = null;
+          this.pickConfirmed = false;
+          
           console.log('[Stylizer] 🧹 Cleaning up select event listeners', { timeSinceAttach, modalStillOpen });
           selectListeners.forEach(cleanup => cleanup());
           selectListeners = [];
@@ -393,8 +407,28 @@ export class Stylizer {
       // Monkey patch to add 'select' event
       this.patchFontPickerSelectEvent(picker);
       
-      // Listen for font selection
+      // Listen for 'select' event if livePreview is enabled (applies fonts as user browses)
+      if (this.config.livePreview) {
+        (picker as any).on('select', (font: any) => {
+          if (font && font.family) {
+            const fontInfo = {
+              family: font.family.name || font.family,
+              weight: font.weight || 400,
+              italic: font.italic || false,
+            };
+            // Apply font asynchronously (don't await in event handler)
+            this.applyFont(fontType, fontInfo).catch(error => {
+              webComponentsLogger.error('Failed to apply font in live preview', { fontType, fontInfo, error });
+            });
+          }
+        });
+      }
+      
+      // Listen for font selection (when select button is clicked)
       (picker as any).on('pick', (font: any) => {
+        // Mark pick as confirmed
+        this.pickConfirmed = true;
+        
         if (font && font.family) {
           // Capture full font information including weight and italic
           const fontInfo = {
@@ -461,6 +495,10 @@ export class Stylizer {
    * Open font picker
    */
   public async openFontPicker(fontType: FontType = 'primary', mode: FontMode = 'curated', curatedFonts?: string[]): Promise<void> {
+    // Store current font state before opening picker (for cancel/revert)
+    this.originalFontState = this.fontState[fontType] ? { ...this.fontState[fontType] } : null;
+    this.pickConfirmed = false;
+    
     // Find font config to get curated fonts
     const fontConfig = this.config.fonts.find(f => f.id === fontType);
     const fontsToUse = curatedFonts ?? fontConfig?.curatedFonts ?? CURATED_FONTS;

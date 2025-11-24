@@ -54,7 +54,8 @@ async function configureStylizer() {
         style: '--font-secondary-style'
       }
     },
-    previewText: 'Build. Lead. Learn. JSG Tech Check.'
+    previewText: 'Build. Lead. Learn. JSG Tech Check.',
+    livePreview: true
   };
   
   if (apiKey) {

@@ -72,6 +72,7 @@ export interface StylizerConfig {
   theme?: ThemeConfig;
   googleApiKey?: string;
   previewText?: string;
+  livePreview?: boolean;
 }
 
 /**
@@ -82,6 +83,7 @@ export interface InternalConfig {
   theme: ThemeConfig;
   googleApiKey: string;
   previewText: string;
+  livePreview: boolean;
 }
 
 /**
@@ -115,6 +117,7 @@ export const defaultConfig: InternalConfig = {
   theme: {},
   googleApiKey: '',
   previewText: DEFAULT_CONFIG.previewText,
+  livePreview: false,
 };
 
 /**
@@ -236,6 +239,7 @@ export function mergeConfig(userConfig: StylizerConfig = {}): InternalConfig {
     },
     googleApiKey: userConfig.googleApiKey ?? defaultConfig.googleApiKey,
     previewText: userConfig.previewText ?? defaultConfig.previewText,
+    livePreview: userConfig.livePreview ?? defaultConfig.livePreview,
   };
 }
 
@@ -325,6 +329,9 @@ export function validateConfig(config: StylizerConfig): void {
   }
   if (config.previewText && typeof config.previewText !== 'string') {
     throw new Error('previewText must be a string');
+  }
+  if (config.livePreview !== undefined && typeof config.livePreview !== 'boolean') {
+    throw new Error('livePreview must be a boolean');
   }
 }
 
