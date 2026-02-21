@@ -2,8 +2,8 @@
 
 ## Current Status
 
-**Last Updated**: November 23, 2025  
-**Current Phase**: Phase 7 Complete ✅ | Phase 8 Next (Color Selection & Theme Management)
+**Last Updated**: December 2024  
+**Current Phase**: Phase 7 Complete ✅ | Phase 8 Next (Robustness Improvements)
 
 ### Phase 1: Foundation & Config System ✅ **COMPLETE**
 
@@ -354,7 +354,167 @@ interface StylizerConfig {
 - ✅ `demo/index.html` - Already matches current API (verified)
 - ✅ `demo/scripts/demo.js` - Already uses config API (verified)
 
-### Phase 7: CSS Variable Color Selection & Theme Management
+### Phase 8: Robustness Improvements
+
+**Status**: ⏳ Pending  
+**Goal**: Make Stylizer more robust so consuming applications need less setup code. Reduce integration complexity by handling common concerns internally.
+
+**Problem Statement**:
+Current integration requires significant setup code:
+- Manual localStorage reading before Zustand hydration
+- Manual CSS variable application after configuration
+- Manual DOM readiness handling
+- Manual event listener setup and cleanup
+- Manual sync between Stylizer and external state management
+
+**Solution**: Add built-in support for persistence, automatic CSS variable application, and DOM readiness handling.
+
+**Tasks**:
+
+1. **Built-in Persistence Support**
+   - Add `persistence` config option to `StylizerConfig`
+   - Implement internal localStorage read/write for font choices
+   - Automatically restore persisted fonts on `configure()` call
+   - Support custom storage key and storage mechanism (localStorage/sessionStorage)
+   - Persist font choices automatically when fonts change
+
+2. **Automatic CSS Variable Application**
+   - Add `autoApplyCSSVariables` config option (default: `true`)
+   - Automatically apply CSS variables to `:root` after `configure()` completes
+   - Automatically update CSS variables whenever fonts change
+   - Ensure CSS variables persist after configuration (handle SSR/hydration scenarios)
+   - Remove need for manual `applyFontsToCSSVariables()` calls in consuming apps
+
+3. **Built-in DOM Readiness Handling**
+   - Add `waitForDOM` config option (default: `true`)
+   - Automatically wait for `DOMContentLoaded` if DOM not ready
+   - Handle SSR/hydration scenarios gracefully
+   - Add small delay to ensure all DOM nodes are ready
+   - Remove need for manual `waitForDOMReady()` calls in consuming apps
+
+4. **Promise-Based Initialization**
+   - Make `Stylizer.configure()` return a Promise
+   - Promise resolves when:
+     - DOM is ready (if `waitForDOM: true`)
+     - Persisted fonts are restored (if `persistence.enabled: true`)
+     - CSS variables are applied (if `autoApplyCSSVariables: true`)
+     - Event listeners are set up
+   - Allows consuming apps to await initialization completion
+
+**Config API Changes**:
+
+```typescript
+interface StylizerConfig {
+  // ... existing config options
+  
+  /**
+   * Persistence configuration for font choices
+   * When enabled, Stylizer automatically saves/restores font choices from storage
+   */
+  persistence?: {
+    enabled?: boolean;           // Default: false (backward compatible)
+    storageKey?: string;         // Default: 'stylizer-font-choices'
+    storage?: Storage;          // Default: localStorage (can use sessionStorage)
+  };
+  
+  /**
+   * Automatically apply CSS variables to :root when fonts change
+   * When true, Stylizer handles all CSS variable updates internally
+   */
+  autoApplyCSSVariables?: boolean;  // Default: true
+  
+  /**
+   * Wait for DOM to be ready before initializing
+   * Handles DOMContentLoaded and SSR/hydration scenarios
+   */
+  waitForDOM?: boolean;          // Default: true
+}
+```
+
+**Implementation Details**:
+
+**Persistence** (`src/Stylizer.ts`):
+- Add `persistFonts()` method - saves current font state to storage
+- Add `restoreFonts()` method - reads persisted fonts from storage
+- Call `restoreFonts()` at start of `configure()` if `persistence.enabled: true`
+- Call `persistFonts()` whenever fonts change (in font picker handlers)
+- Use provided storage key or default to `'stylizer-font-choices'`
+- Handle storage errors gracefully (fallback to defaults)
+
+**CSS Variable Application** (`src/Stylizer.ts`):
+- Add `applyCSSVariables()` method - applies current fonts to CSS variables
+- Call `applyCSSVariables()` after `configure()` completes (if `autoApplyCSSVariables: true`)
+- Call `applyCSSVariables()` whenever fonts change (in font picker handlers)
+- Ensure CSS variables are applied even after page reload/hydration
+- Use same CSS variable names from config
+
+**DOM Readiness** (`src/Stylizer.ts`):
+- Add `waitForDOMReady()` internal method
+- Check `document.readyState` - if `'loading'`, wait for `DOMContentLoaded`
+- Add small delay (100ms) to ensure all DOM nodes are ready
+- Call at start of `configure()` if `waitForDOM: true`
+- Make `configure()` async and await DOM readiness
+
+**Promise-Based API**:
+- Make `configure()` return `Promise<void>`
+- Await DOM readiness (if enabled)
+- Await font restoration (if persistence enabled)
+- Apply CSS variables (if auto-apply enabled)
+- Resolve promise when all initialization complete
+
+**Files to Modify**:
+- `src/Stylizer.ts` - Add persistence, auto-apply, DOM readiness logic
+- `src/config.ts` - Add new config options to `StylizerConfig` and `InternalConfig`
+- `src/types.ts` - Add persistence config types
+- `README.md` - Document new config options and simplified usage
+
+**Benefits**:
+- **Reduced Integration Code**: Consuming apps go from ~50 lines to ~5 lines
+- **Fewer Manual Steps**: No localStorage reading, no CSS variable application, no DOM readiness handling
+- **Better SSR Support**: Handles hydration scenarios automatically
+- **Backward Compatible**: All new options have sensible defaults (persistence disabled by default)
+- **Framework Agnostic**: Works with any framework, not just React/Zustand
+
+**Example Usage After Implementation**:
+
+**Before** (current - ~50 lines):
+```typescript
+// Complex setup with hooks, utilities, manual sync
+useMount(async () => {
+  await waitForDOMReady();
+  const persisted = getPersistedFonts();
+  const config = createStylizerConfig(...);
+  await Stylizer.configure(config);
+});
+useFontApplication();
+useStylizerListener();
+```
+
+**After** (with improvements - ~5 lines):
+```typescript
+await Stylizer.configure({
+  fonts: { primary: 'Inter', secondary: 'Space Mono' },
+  cssVariables: { /* ... */ },
+  persistence: { enabled: true },
+  autoApplyCSSVariables: true,
+  waitForDOM: true,
+});
+// That's it! Stylizer handles everything internally
+```
+
+**Timeline**: 6-8 hours (1 day)
+
+**Breaking Changes**: None - all new options are optional with backward-compatible defaults
+
+**Testing**:
+- Test persistence with localStorage
+- Test persistence with sessionStorage
+- Test auto-apply CSS variables on init and font changes
+- Test DOM readiness handling in SSR scenarios
+- Test promise-based initialization
+- Verify backward compatibility (existing configs still work)
+
+### Phase 9: CSS Variable Color Selection & Theme Management
 
 **Goal**: Add variable-centric color management with framework presets
 
@@ -433,7 +593,7 @@ interface StylizerConfig {
 - Allow users to select from dropdown: "light", "dark", "cupcake", "synthwave", etc.
 - Apply selected DaisyUI theme to any framework (map to their CSS variables)
 
-### Phase 8: Testing & Polish
+### Phase 10: Testing & Polish
 
 **Goal**: Test across frameworks, polish UX
 
@@ -465,12 +625,12 @@ interface StylizerConfig {
 
 ## Future Phases (Post-Rewrite)
 
-### Phase 9: Custom Preset Creation (Future)
+### Phase 11: Custom Preset Creation (Future)
 - Users can create/import custom presets
 - Preset sharing and export
 - Community preset repository
 
-### Phase 10: Advanced Features (Future)
+### Phase 12: Advanced Features (Future)
 - Font pairing suggestions
 - Performance metrics
 - A11y improvements
@@ -528,12 +688,15 @@ interface StylizerConfig {
 - [x] Sidebar mounts and displays correctly (visible by default) ✅ (Phase 2)
 - [x] Collapse/expand works (X button → small button → reopen) ✅ (Phase 2)
 - [x] Font changes update sidebar in real-time ✅ (Phase 2)
-- [ ] Color selection integrated ⏳ Phase 7
-- [ ] Framework presets working ⏳ Phase 7
-- [ ] Import/export functionality ⏳ Phase 7
-- [ ] Works in all target frameworks ⏳ Phase 8
-- [ ] Bundle size reasonable (< 80KB gzipped with color features) ⏳ Phase 8
-- [ ] Documentation complete ⏳ Phase 7-8
+- [ ] Built-in persistence working ⏳ Phase 8
+- [ ] Auto-apply CSS variables working ⏳ Phase 8
+- [ ] DOM readiness handling working ⏳ Phase 8
+- [ ] Color selection integrated ⏳ Phase 9
+- [ ] Framework presets working ⏳ Phase 9
+- [ ] Import/export functionality ⏳ Phase 9
+- [ ] Works in all target frameworks ⏳ Phase 10
+- [ ] Bundle size reasonable (< 80KB gzipped with color features) ⏳ Phase 10
+- [ ] Documentation complete ⏳ Phase 8-10
 - [x] Demo site updated ✅ (Phase 2 - header, text formatting, layout improvements)
 - [x] State persists across reloads ✅ (Phase 2 - localStorage for collapsed state)
 
@@ -545,10 +708,11 @@ interface StylizerConfig {
 - **Phase 4**: ✅ Complete (November 7, 2025) - State management and events fully implemented
 - **Phase 5**: ✅ Complete (November 7, 2025) - Config API finalized
 - **Phase 6**: ✅ Complete (November 7, 2025) - Cleanup & migration verified
-- **Phase 7**: ⏳ Pending (Color Selection & Theme Management) - 2-3 days estimated
-- **Phase 8**: ⏳ Pending (Testing & Polish) - 2-3 days estimated
+- **Phase 8**: ⏳ Pending (Robustness Improvements) - 1 day estimated
+- **Phase 9**: ⏳ Pending (Color Selection & Theme Management) - 2-3 days estimated
+- **Phase 10**: ⏳ Pending (Testing & Polish) - 2-3 days estimated
 
-**Total**: ~12-18 days estimated | ~6 days completed
+**Total**: ~13-19 days estimated | ~6 days completed
 
 ## Notes
 
